@@ -27,7 +27,7 @@ import Heightmap from "./Engine/Rendering/Objects/GraphicsObjects/Heightmap";
 import WorldEditor, {
   addNewConsoleCommand,
 } from "./Engine/Tooling/WorldEditor";
-import Vec3Slerp from "./Engine/Tooling/Vec3Slerp";
+import Vec3Lerp from "./Engine/Tooling/Vec3Lerp";
 
 // Rendering exports
 export { Renderer3D, Renderer2D, GUIRenderer, Scene, Camera };
@@ -50,7 +50,7 @@ export {
 };
 
 // Tooling
-export { WorldEditor, addNewConsoleCommand, Vec3Slerp };
+export { WorldEditor, addNewConsoleCommand, Vec3Lerp as Vec3Slerp };
 
 // Global exports
 export let applicationStartTime = Date.now();

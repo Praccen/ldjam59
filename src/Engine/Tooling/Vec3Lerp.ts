@@ -1,6 +1,6 @@
 import { vec3 } from "gl-matrix";
 
-export default class Vec3Slerp {
+export default class Vec3Lerp {
   private duration: number;
 
   private start: vec3;
