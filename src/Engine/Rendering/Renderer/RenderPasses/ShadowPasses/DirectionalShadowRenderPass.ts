@@ -65,9 +65,9 @@ export default class DirectionalShadowRenderPass {
   }
 
   draw(scene: Scene) {
-    if (this.frameCounter++ % 5 != 0) {
-      return;
-    }
+    // if (this.frameCounter++ % 5 != 0) {
+    //   return;
+    // }
 
     this.shadowBuffer.bind(this.gl.FRAMEBUFFER);
 

@@ -21,6 +21,7 @@ export default class Game {
 
   camera: Camera = new Camera();
   scene: Scene = null;
+  scene2: Scene = null;
 
   player: Player;
   physicsScene: PhysicsScene;
@@ -38,6 +39,7 @@ export default class Game {
     this.renderer.setFogDensity(0.03);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
+    this.renderer.setFogMaxDistance(100);
     this.renderer.setSkybox("Assets/Skybox");
 
     // Create a camera and set it's starting position
@@ -51,6 +53,12 @@ export default class Game {
 
   createLevel() {
     this.scene = new Scene(this.renderer);
+    this.scene2 = new Scene(this.renderer);
+
+    this.scene2.directionalLight.direction = this.scene.directionalLight.direction;
+
+    this.scene2.addNewMesh("Assets/objs/cube.obj", "CSS:rgb(255,0,0)", "CSS:rgb(0,0,0)");
+    
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
     this.player = new Player(this.physicsScene);
@@ -128,6 +136,9 @@ export default class Game {
 
   draw() {
     this.renderer.render(this.scene, this.camera, this.camera.getFrustum());
+    this.renderer.isOverlay = true;
+    this.renderer.render(this.scene2, this.camera, this.camera.getFrustum());
+    this.renderer.isOverlay = false;
 
     this.guiRenderer.draw(this.camera);
   }

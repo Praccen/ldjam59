@@ -91,6 +91,10 @@ export default class Renderer3D extends RendererBase {
   private finishedOutputRenderPass: ScreenQuadPass;
   // -------------------------
 
+  // ---- Overlay rendering ----
+  isOverlay: Boolean = false;
+  // ---------------------------
+
   constructor() {
     super();
 
@@ -314,11 +318,19 @@ export default class Renderer3D extends RendererBase {
       this.clearColour.b,
       this.clearColour.a
     );
-    this.gl.clear(
-      this.gl.COLOR_BUFFER_BIT |
-        this.gl.DEPTH_BUFFER_BIT |
-        this.gl.STENCIL_BUFFER_BIT
-    );
+
+    if (this.isOverlay) {
+      this.gl.clear(
+          this.gl.DEPTH_BUFFER_BIT |
+          this.gl.STENCIL_BUFFER_BIT
+      );
+    } else {
+      this.gl.clear(
+        this.gl.COLOR_BUFFER_BIT |
+          this.gl.DEPTH_BUFFER_BIT |
+          this.gl.STENCIL_BUFFER_BIT
+      );
+    }
 
     // ---- Lighting pass ----
     this.lightingRenderPass.draw(scene, camera);
