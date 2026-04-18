@@ -8,6 +8,7 @@ const jumpForce: number = 1.5;
 const sensitivity: number = 0.4;
 
 export default class Player {
+  physicsScene: PhysicsScene;
   physicsObject: PhysicsObject;
 
   mouseMovement: vec2 = vec2.create();
@@ -20,6 +21,7 @@ export default class Player {
   private mouseRightWasClicked: boolean = false;
 
   constructor(physicsScene: PhysicsScene) {
+    this.physicsScene = physicsScene;
     this.physicsObject = physicsScene.addNewPhysicsObject();
     vec3.set(this.physicsObject.transform.scale, 1.0, 2.0, 1.0);
     vec3.set(this.physicsObject.transform.origin, 0.0, -0.5, 0.0);
@@ -57,10 +59,6 @@ export default class Player {
       this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
       this.jaw = this.jaw % 360;
     }
-
-    camera.setPitchJawDegrees(this.pitch, this.jaw);
-
-    // vec3.scaleAndAdd(this.physicsObject.force, this.physicsObject.force, camera.getDir(), acceleration);
 
     this.handleInput(camera, platform);
 
@@ -107,8 +105,23 @@ export default class Player {
     // Move to block ad point
     if (Input.keys["E"]) {
       let ray = new Ray();
-      ray.setDir(vec3.clone(camera.getDir()));
-      ray.setStart(vec3.clone(camera.getPosition()));
+      ray.setStartAndDir(camera.getPosition(), camera.getDir());
+      let hit = this.physicsScene.doRayCast(
+        ray,
+        true,
+        [this.physicsObject],
+        100.0,
+      );
+      if (hit.object == undefined) {
+        return;
+      }
+
+      console.debug("Got hit", hit);
+      let block = platform.getBlockFromPhysicsObject(hit.object);
+      if (block) {
+        this.setConnectedBlock(block);
+        console.debug("Moving to block", block);
+      }
     }
 
     // Jump off platform
