@@ -5,6 +5,7 @@ import {
   MousePicking,
   PhysicsObject,
   PhysicsScene,
+  quat,
   Ray,
   Scene,
   vec3,
@@ -244,5 +245,35 @@ export class Platform {
     this.physicsScene.removePhysicsObject(block.physicsObject);
     this.scene.deleteGraphicsBundle(block.graphicsBundle);
     this.attachedBlocks.delete(key);
+  }
+
+  splitPlatform() {
+    for (let block of this.attachedBlocks) {
+      if (block[1] == undefined) {
+        continue;
+      }
+      block[1]!.graphicsBundle.transform.position = vec3.transformMat4(
+        vec3.create(),
+        vec3.create(),
+        block[1].graphicsBundle.transform.matrix
+      );
+
+      block[1]!.graphicsBundle.transform.rotation = mat4.getRotation(
+        quat.create(),
+        block[1]!.graphicsBundle.transform.matrix
+      );
+      block[1]!.graphicsBundle.transform.parentTransform = null!;
+
+      block[1]!.physicsObject.isImmovable = false;
+      vec3.set(
+        block[1]!.physicsObject.impulse,
+        Math.random(),
+        Math.random(),
+        Math.random()
+      );
+    }
+    this.attachedBlocks.clear();
+    this.physicsObjectIdToAttachedBlocksKey.clear();
+    this.baseBlock = null!;
   }
 }
