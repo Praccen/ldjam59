@@ -130,9 +130,9 @@ export default class Game {
     if (this.sun != undefined) {
       vec3.set(
         this.sun.transform.position,
-        Math.sin(this.gameTimer) * 20000,
-        Math.cos(this.gameTimer) * 20000.0,
-        -200.0 + Math.sin(this.gameTimer) * 20000.0
+        Math.sin(this.gameTimer * 0.2) * 20000,
+        Math.cos(this.gameTimer * 0.2) * 20000.0,
+        -200.0 + Math.sin(this.gameTimer * 0.2) * 20000.0
       );
     }
 

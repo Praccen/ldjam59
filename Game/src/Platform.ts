@@ -60,8 +60,7 @@ export class Platform {
             .addNewMesh(
                 "Assets/objs/cube.obj",
                 "CSS:rgb(255, 0, 0)",
-                "CSS:rgb(0,0,0)",
-                true
+                "CSS:rgb(0,0,0)"
             )
             .then((gb) => {
                 gb.transform.position = baseBlockStartingPosition;
