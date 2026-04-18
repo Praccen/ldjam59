@@ -9,7 +9,7 @@ export default class ShaderProgram {
     shaderProgramName: string,
     vertexShaderSrc: string,
     fragmentShaderSrc: string,
-    debugShaderCompilation: boolean = false
+    debugShaderCompilation: boolean = false,
   ) {
     this.gl = gl;
     this.shaderProgram = null;
@@ -17,7 +17,7 @@ export default class ShaderProgram {
       shaderProgramName,
       vertexShaderSrc,
       fragmentShaderSrc,
-      debugShaderCompilation
+      debugShaderCompilation,
     );
     this.uniformBindings = new Map<string, WebGLUniformLocation>();
   }
@@ -26,7 +26,7 @@ export default class ShaderProgram {
     shaderProgramName: string,
     vertexShaderString: string,
     fragmentShaderString: string,
-    debugShaderCompilation: boolean
+    debugShaderCompilation: boolean,
   ) {
     // link shaders
     if (this.shaderProgram != null) {
@@ -47,11 +47,11 @@ export default class ShaderProgram {
     ) {
       console.log(
         "Vertex shader compiled successfully: " +
-          this.gl.getShaderParameter(vertexShader, this.gl.COMPILE_STATUS)
+          this.gl.getShaderParameter(vertexShader, this.gl.COMPILE_STATUS),
       );
       console.log(
         "Vertex shader compiler log: \n" +
-          this.gl.getShaderInfoLog(vertexShader)
+          this.gl.getShaderInfoLog(vertexShader),
       );
     }
 
@@ -67,11 +67,11 @@ export default class ShaderProgram {
     ) {
       console.log(
         "Fragment shader compiled successfully: " +
-          this.gl.getShaderParameter(fragmentShader, this.gl.COMPILE_STATUS)
+          this.gl.getShaderParameter(fragmentShader, this.gl.COMPILE_STATUS),
       );
       console.log(
         "Fragment shader compiler log: \n" +
-          this.gl.getShaderInfoLog(fragmentShader)
+          this.gl.getShaderInfoLog(fragmentShader),
       );
     }
 
@@ -84,13 +84,13 @@ export default class ShaderProgram {
     // Check for linking errors?
     let linkedShaders = this.gl.getProgramParameter(
       this.shaderProgram,
-      this.gl.LINK_STATUS
+      this.gl.LINK_STATUS,
     );
     if (!linkedShaders || debugShaderCompilation) {
       console.log("Linked shaders successfully: " + linkedShaders);
       console.log(
         "Linking shaders log: \n" +
-          this.gl.getProgramInfoLog(this.shaderProgram)
+          this.gl.getProgramInfoLog(this.shaderProgram),
       );
     }
 
@@ -106,7 +106,7 @@ export default class ShaderProgram {
   setUniformLocation(uniformName: string) {
     this.uniformBindings.set(
       uniformName,
-      this.gl.getUniformLocation(this.shaderProgram, uniformName)
+      this.gl.getUniformLocation(this.shaderProgram, uniformName),
     );
   }
 

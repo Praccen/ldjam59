@@ -70,7 +70,7 @@ function animate() {
   fpsUpdateTimer += dt;
   if (fpsUpdateTimer > 0.5) {
     gameContext.metaGui.fpsDisplay.textString = Math.floor(
-      frames / fpsUpdateTimer
+      frames / fpsUpdateTimer,
     ).toString();
     frames = 0;
     fpsUpdateTimer = 0.0;

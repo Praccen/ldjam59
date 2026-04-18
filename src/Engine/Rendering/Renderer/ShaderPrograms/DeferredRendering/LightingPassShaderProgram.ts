@@ -254,7 +254,7 @@ export default class LightingPassShaderProgram extends ShaderProgram {
       this.setUniformLocation("pointDepthMaps[" + i + "]");
       gl.uniform1i(
         this.getUniformLocation("pointDepthMaps[" + i + "]")[0],
-        5 + i
+        5 + i,
       );
     }
 

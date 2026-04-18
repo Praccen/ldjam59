@@ -24,7 +24,7 @@ export class TreeSceneContentElement extends TreeNodeContentElement {
     let obb = new OBB();
     obb.setMinAndMaxVectors(
       graphicsBundle.getMinAndMaxPositions().min,
-      graphicsBundle.getMinAndMaxPositions().max
+      graphicsBundle.getMinAndMaxPositions().max,
     );
     obb.setTransformMatrix(graphicsBundle.transform.matrix);
     super(obb);
@@ -39,7 +39,7 @@ export class InstancedTreeSceneContentElement extends TreeNodeContentElement {
     let obb = new OBB();
     obb.setMinAndMaxVectors(
       graphicsBundle.getMinAndMaxPositions().min,
-      graphicsBundle.getMinAndMaxPositions().max
+      graphicsBundle.getMinAndMaxPositions().max,
     );
     obb.setTransformMatrix(transform.matrix);
     super(obb);
@@ -94,13 +94,25 @@ export default class Scene {
     // ------------------
 
     this.stillTree = new Tree(
-      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [true, false, true])
+      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [
+        true,
+        false,
+        true,
+      ]),
     );
     this.instancedTree = new Tree(
-      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [true, false, true])
+      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [
+        true,
+        false,
+        true,
+      ]),
     );
     this.animatedTree = new Tree(
-      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [true, false, true])
+      new TreeNode(200, vec3.fromValues(0, 0, 0), 100, 200, [
+        true,
+        false,
+        true,
+      ]),
     );
   }
 
@@ -108,7 +120,7 @@ export default class Scene {
     meshPath: string,
     diffusePath: string,
     specularPath: string,
-    displayShape: boolean = false
+    displayShape: boolean = false,
   ): Promise<GraphicsBundle> {
     return this.renderer.meshStore.getMesh(meshPath).then((mesh) => {
       const index =
@@ -117,8 +129,8 @@ export default class Scene {
             this.renderer.gl,
             this.renderer.textureStore.getTexture(diffusePath),
             this.renderer.textureStore.getTexture(specularPath),
-            mesh
-          )
+            mesh,
+          ),
         ) - 1;
       const treeEntry = new TreeSceneContentElement(this.graphicBundles[index]);
       this.stillTree.addContent(treeEntry);
@@ -133,7 +145,7 @@ export default class Scene {
     heightmapPath: string,
     diffusePath: string,
     specularPath: string,
-    displayShape: boolean = false
+    displayShape: boolean = false,
   ): Promise<GraphicsBundle> {
     return this.renderer.meshStore.getHeightmap(heightmapPath).then((mesh) => {
       const index =
@@ -142,8 +154,8 @@ export default class Scene {
             this.renderer.gl,
             this.renderer.textureStore.getTexture(diffusePath),
             this.renderer.textureStore.getTexture(specularPath),
-            mesh
-          )
+            mesh,
+          ),
         ) - 1;
       const treeEntry = new TreeSceneContentElement(this.graphicBundles[index]);
       this.stillTree.addContent(treeEntry);
@@ -161,7 +173,7 @@ export default class Scene {
     zQuadSize: number,
     diffusePath: string,
     specularPath: string,
-    displayShape: boolean = false
+    displayShape: boolean = false,
   ): GraphicsBundle {
     let heightmapMesh = new Heightmap(this.renderer.gl);
     const index =
@@ -170,8 +182,8 @@ export default class Scene {
           this.renderer.gl,
           this.renderer.textureStore.getTexture(diffusePath),
           this.renderer.textureStore.getTexture(specularPath),
-          heightmapMesh
-        )
+          heightmapMesh,
+        ),
       ) - 1;
     heightmapMesh.createPlane(xResolution, zResolution, xQuadSize, zQuadSize);
     this.graphicBundles[index].updateMinAndMaxPositions();
@@ -186,7 +198,7 @@ export default class Scene {
   async addNewInstancedMesh(
     meshPath: string,
     diffusePath: string,
-    specularPath: string
+    specularPath: string,
   ): Promise<GraphicsBundle> {
     return this.renderer.meshStore.getMesh(meshPath).then((mesh) => {
       const index =
@@ -197,8 +209,8 @@ export default class Scene {
             this.renderer.textureStore.getTexture(specularPath),
             mesh,
             null,
-            true
-          )
+            true,
+          ),
         ) - 1;
       return this.graphicBundlesInstanced[index];
     });
@@ -209,8 +221,8 @@ export default class Scene {
     this.instancedTree.addContent(
       new InstancedTreeSceneContentElement(
         instancedMesh,
-        instancedMesh.instancedTransforms[index]
-      )
+        instancedMesh.instancedTransforms[index],
+      ),
     );
 
     return instancedMesh.instancedTransforms[index];
@@ -220,7 +232,7 @@ export default class Scene {
     meshPath: string,
     diffusePath: string,
     specularPath: string,
-    useColoursFromGltfFileIfExists: boolean = true
+    useColoursFromGltfFileIfExists: boolean = true,
   ): Promise<AnimatedGraphicsBundle> {
     return this.renderer.meshStore.getAmimatedMesh(meshPath).then((mesh) => {
       const index =
@@ -229,8 +241,8 @@ export default class Scene {
             this.renderer.gl,
             this.renderer.textureStore.getTexture(diffusePath),
             this.renderer.textureStore.getTexture(specularPath),
-            mesh
-          )
+            mesh,
+          ),
         ) - 1;
 
       if (mesh.diffuseTextures != undefined && useColoursFromGltfFileIfExists) {
@@ -239,7 +251,7 @@ export default class Scene {
       }
 
       const treeEntry = new TreeSceneContentElement(
-        this.graphicBundlesAnimated[index]
+        this.graphicBundlesAnimated[index],
       );
       this.animatedTree.addContent(treeEntry);
       // this.addNewShape(treeEntry.shape);
@@ -249,14 +261,14 @@ export default class Scene {
 
   addNewParticleSpawner(
     texturePath: string,
-    numberOfStartingParticles: number = 0
+    numberOfStartingParticles: number = 0,
   ): ParticleSpawner {
     let length = this.particleSpawners.push(
       new ParticleSpawner(
         this.renderer.gl,
         this.renderer.textureStore.getTexture(texturePath),
-        numberOfStartingParticles
-      )
+        numberOfStartingParticles,
+      ),
     );
     return this.particleSpawners[length - 1];
   }
@@ -275,7 +287,7 @@ export default class Scene {
   addNewShape(shape: Shape): ShapeGraphicsObject {
     let index =
       this.shapeGraphicsObjects.push(
-        new ShapeGraphicsObject(this.renderer.gl, shape)
+        new ShapeGraphicsObject(this.renderer.gl, shape),
       ) - 1;
     this.shapeGraphicsObjects[index];
 
@@ -306,7 +318,7 @@ export default class Scene {
     this.graphicBundlesAnimated = this.graphicBundlesAnimated.filter(
       (value) => {
         return bundle !== value;
-      }
+      },
     );
   }
 
@@ -354,7 +366,7 @@ export default class Scene {
     this.stillTree.recalculate((content: TreeSceneContentElement) => {
       (content.shape as OBB).setMinAndMaxVectors(
         content.graphicsBundle.getMinAndMaxPositions().min,
-        content.graphicsBundle.getMinAndMaxPositions().max
+        content.graphicsBundle.getMinAndMaxPositions().max,
       );
       content.shape.setTransformMatrix(content.graphicsBundle.transform.matrix);
     });
@@ -363,14 +375,14 @@ export default class Scene {
     this.instancedTree.recalculate(
       (content: InstancedTreeSceneContentElement) => {
         content.shape.setUpdateNeeded();
-      }
+      },
     );
     this.instancedTree.prune();
 
     this.animatedTree.recalculate((content: TreeSceneContentElement) => {
       (content.shape as OBB).setMinAndMaxVectors(
         content.graphicsBundle.getMinAndMaxPositions().min,
-        content.graphicsBundle.getMinAndMaxPositions().max
+        content.graphicsBundle.getMinAndMaxPositions().max,
       );
       content.shape.setTransformMatrix(content.graphicsBundle.transform.matrix);
     });
@@ -433,7 +445,7 @@ export default class Scene {
     const animatedContentFromTree = new Array<TreeSceneContentElement>();
     this.animatedTree.getContentFromIntersection(
       frustums,
-      animatedContentFromTree
+      animatedContentFromTree,
     );
 
     for (const content of animatedContentFromTree) {
@@ -450,7 +462,7 @@ export default class Scene {
       new Array<InstancedTreeSceneContentElement>();
     this.instancedTree.getContentFromIntersection(
       frustums,
-      instancedContentFromTree
+      instancedContentFromTree,
     );
 
     for (const content of instancedContentFromTree) {
@@ -473,7 +485,7 @@ export default class Scene {
 
   renderScene(
     shaderProgram: ShaderProgram,
-    bindSpecialTextures: boolean = true
+    bindSpecialTextures: boolean = true,
   ) {
     for (const bundle of this.graphicBundles) {
       bundle.draw(shaderProgram, bindSpecialTextures);
@@ -482,7 +494,7 @@ export default class Scene {
 
   renderSceneInstanced(
     shaderProgram: ShaderProgram,
-    bindSpecialTextures: boolean = true
+    bindSpecialTextures: boolean = true,
   ) {
     for (const bundle of this.graphicBundlesInstanced) {
       bundle.draw(shaderProgram, bindSpecialTextures);
@@ -491,7 +503,7 @@ export default class Scene {
 
   renderSceneAnimated(
     shaderProgram: ShaderProgram,
-    bindSpecialTextures: boolean = true
+    bindSpecialTextures: boolean = true,
   ) {
     for (const bundle of this.graphicBundlesAnimated) {
       bundle.draw(shaderProgram, bindSpecialTextures);
@@ -503,7 +515,7 @@ export default class Scene {
    */
   renderSceneInLayerOrder(
     shaderProgram: ShaderProgram,
-    bindSpecialTextures: boolean = true
+    bindSpecialTextures: boolean = true,
   ) {
     let layer = -1;
     let layersLeft = true;
@@ -537,11 +549,11 @@ export default class Scene {
       if (content.graphicsBundle.enabled) {
         let shapeGraphicsObject = new ShapeGraphicsObject(
           this.renderer.gl,
-          content.shape
+          content.shape,
         );
         if (
           this.cullingShapeTransformsToMarkAsGreen.find(
-            (transform) => transform == content.graphicsBundle.transform
+            (transform) => transform == content.graphicsBundle.transform,
           ) != undefined
         ) {
           vec4.set(shapeGraphicsObject.colour, 0.0, 1.0, 0.0, 1.0);
@@ -557,11 +569,11 @@ export default class Scene {
       if (content.graphicsBundle.enabled) {
         let shapeGraphicsObject = new ShapeGraphicsObject(
           this.renderer.gl,
-          content.shape
+          content.shape,
         );
         if (
           this.cullingShapeTransformsToMarkAsGreen.find(
-            (transform) => transform == content.graphicsBundle.transform
+            (transform) => transform == content.graphicsBundle.transform,
           ) != undefined
         ) {
           vec4.set(shapeGraphicsObject.colour, 0.0, 1.0, 0.0, 1.0);
@@ -578,11 +590,11 @@ export default class Scene {
       if (content.transform.enabled) {
         let shapeGraphicsObject = new ShapeGraphicsObject(
           this.renderer.gl,
-          content.shape
+          content.shape,
         );
         if (
           this.cullingShapeTransformsToMarkAsGreen.find(
-            (transform) => transform == content.graphicsBundle.transform
+            (transform) => transform == content.graphicsBundle.transform,
           ) != undefined
         ) {
           vec4.set(shapeGraphicsObject.colour, 0.0, 1.0, 0.0, 1.0);

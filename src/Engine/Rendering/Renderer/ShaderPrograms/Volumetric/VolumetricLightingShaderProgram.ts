@@ -238,7 +238,7 @@ export default class VolumetricLightingShaderProgram extends ShaderProgram {
       "VolumetricLightingShaderProgram",
       screenQuadVertexSrc,
       getFragSrc(),
-      false
+      false,
     );
 
     this.use();
@@ -262,7 +262,7 @@ export default class VolumetricLightingShaderProgram extends ShaderProgram {
       this.setUniformLocation("pointDepthMaps[" + i + "]");
       this.gl.uniform1i(
         this.getUniformLocation("pointDepthMaps[" + i + "]")[0],
-        i + 3
+        i + 3,
       );
     }
 

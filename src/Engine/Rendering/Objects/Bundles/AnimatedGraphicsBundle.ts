@@ -28,7 +28,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
       gos: Array<AnimatedMesh>;
       gltfObject: GltfObject;
     },
-    emissionMap?: Texture
+    emissionMap?: Texture,
   ) {
     super(gl, diffuse, specular, null, emissionMap, false);
     this.boneTextures = [];
@@ -39,7 +39,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
       i++
     ) {
       this.boneTextures.push(
-        new Texture(gl, false, gl.RGBA32F, gl.RGBA, gl.FLOAT)
+        new Texture(gl, false, gl.RGBA32F, gl.RGBA, gl.FLOAT),
       );
       this.bindPoses.push([]);
     }
@@ -48,7 +48,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
       false,
       gl.RGBA32F,
       gl.RGBA,
-      gl.FLOAT
+      gl.FLOAT,
     );
 
     this.graphicsObjectAndGltfObject = graphicsObjectAndGltfObject;
@@ -92,7 +92,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
     originNode: string = "",
     originTranslationMultiplierVector: vec3 = vec3.fromValues(1.0, 1.0, 1.0),
     lowerBound: number = 0.0,
-    upperBound?: number
+    upperBound?: number,
   ): number {
     if (this.graphicsObjectAndGltfObject.gltfObject == undefined) {
       return -1;
@@ -103,12 +103,12 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
     if (upperBound != undefined) {
       timeIdx = this.graphicsObjectAndGltfObject.gltfObject.animate(
         animationIndex,
-        (this.animationTimer % (upperBound - lowerBound)) + lowerBound
+        (this.animationTimer % (upperBound - lowerBound)) + lowerBound,
       );
     } else {
       timeIdx = this.graphicsObjectAndGltfObject.gltfObject.animate(
         animationIndex,
-        this.animationTimer
+        this.animationTimer,
       );
     }
 
@@ -122,7 +122,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
     if (originNode != "") {
       let nodeIndex =
         this.graphicsObjectAndGltfObject.gltfObject.nodeNameToIndexMap.get(
-          originNode
+          originNode,
         );
       if (nodeIndex != undefined) {
         let originPos =
@@ -143,7 +143,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
       this.boneTextures[i].setTextureData(
         this.createBoneTextureData(boneMatrices),
         4,
-        boneMatrices.length
+        boneMatrices.length,
       );
     }
 
@@ -190,7 +190,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
         this.gl.uniformMatrix3fv(
           normalReturn[0],
           false,
-          this.transform.normalMatrix
+          this.transform.normalMatrix,
         );
       }
 
@@ -201,7 +201,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
           customUniform[1].setUniformFunction.call(
             null,
             customUniformReturn[0],
-            ...customUniform[1].args
+            ...customUniform[1].args,
           );
         }
       }
@@ -221,7 +221,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
 
         let skinId =
           this.graphicsObjectAndGltfObject.gltfObject.primitiveToSkinMap.get(
-            goIndex
+            goIndex,
           );
         if (
           skinId >= 0 &&
@@ -233,18 +233,18 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
             this.gl.uniformMatrix4fv(
               modelReturn[0],
               false,
-              this.transform.matrix
+              this.transform.matrix,
             );
           }
         } else if (skinId < 0) {
           const meshId =
             this.graphicsObjectAndGltfObject.gltfObject.primitiveToMeshMap.get(
-              goIndex
+              goIndex,
             );
           if (meshId != undefined) {
             const nodeId =
               this.graphicsObjectAndGltfObject.gltfObject.meshToNodeMap.get(
-                meshId
+                meshId,
               );
             if (
               nodeId < this.graphicsObjectAndGltfObject.gltfObject.nodes.length
@@ -256,7 +256,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
                       .transform.matrix,
                   ]),
                   4,
-                  1
+                  1,
                 );
                 this.noSkinBoneTexture.bind(3);
               }
@@ -273,7 +273,7 @@ export default class AnimatedGraphicsBundle extends GraphicsBundle {
           customUniform[1].setUniformFunction.call(
             null,
             customUniformReturn[0],
-            ...customUniform[1].defaultArgs
+            ...customUniform[1].defaultArgs,
           );
         }
       }

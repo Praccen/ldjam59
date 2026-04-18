@@ -7,7 +7,7 @@ const skin_width = 0.02;
 
 export namespace CollisionSolver {
   export function getTranslationNeeded(
-    intersectionInformation: Array<IntersectionTester.IntersectionInformation>
+    intersectionInformation: Array<IntersectionTester.IntersectionInformation>,
   ): vec3 {
     if (intersectionInformation.length == 0) {
       return vec3.create();
@@ -29,7 +29,7 @@ export namespace CollisionSolver {
         final_mtv,
         final_mtv,
         vec3.normalize(vec3.create(), inf.axis),
-        depth
+        depth,
       );
     }
 
@@ -43,7 +43,7 @@ export namespace CollisionSolver {
   export function handleCollision(
     intersectionInformation: Array<IntersectionTester.IntersectionInformation>,
     po1: PhysicsObject,
-    po2: PhysicsObject
+    po2: PhysicsObject,
   ) {
     for (let inf of intersectionInformation) {
       if (inf.depth < skin_width) {
@@ -61,7 +61,7 @@ export namespace CollisionSolver {
         let eN = vec3.cross(
           vec3.create(),
           vec3.cross(vec3.create(), velDifference, axis),
-          axis
+          axis,
         );
 
         if (vec3.squaredLength(eN) > 0.0001) {
@@ -73,11 +73,11 @@ export namespace CollisionSolver {
 
         let collisionCoefficient = Math.max(
           po1.collisionCoefficient,
-          po2.collisionCoefficient
+          po2.collisionCoefficient,
         ); // TODO: This can be calculated differently, will be based on material abilities in the future
         let frictionCoefficient = Math.min(
           po1.frictionCoefficient,
-          po2.frictionCoefficient
+          po2.frictionCoefficient,
         ); // TODO: This can be calculated differently, will be based on material abilities in the future
 
         if (
@@ -111,13 +111,13 @@ export namespace CollisionSolver {
             -tangentVel1 *
             Math.min(
               frictionCoefficient,
-              frictionCoefficient * Math.abs(u1Dot - v1Dot)
+              frictionCoefficient * Math.abs(u1Dot - v1Dot),
             );
           let frictionMagnitude2 =
             -tangentVel2 *
             Math.min(
               frictionCoefficient,
-              frictionCoefficient * Math.abs(u2Dot - v2Dot)
+              frictionCoefficient * Math.abs(u2Dot - v2Dot),
             );
 
           vec3.scaleAndAdd(e1Change, e1Change, axis, u1Dot - v1Dot);
@@ -133,14 +133,14 @@ export namespace CollisionSolver {
             relativeTangentVel *
             Math.min(
               frictionCoefficient,
-              frictionCoefficient * Math.abs(v2Dot)
+              frictionCoefficient * Math.abs(v2Dot),
             );
 
           vec3.scaleAndAdd(
             e2Change,
             e2Change,
             axis,
-            -v2Dot * (1.0 + collisionCoefficient)
+            -v2Dot * (1.0 + collisionCoefficient),
           );
           vec3.scaleAndAdd(e2Change, e2Change, eN, -frictionMagnitude);
         } else if (po2.isStatic || po2.isImmovable) {
@@ -150,14 +150,14 @@ export namespace CollisionSolver {
             relativeTangentVel *
             Math.min(
               frictionCoefficient,
-              frictionCoefficient * Math.abs(v1Dot)
+              frictionCoefficient * Math.abs(v1Dot),
             );
 
           vec3.scaleAndAdd(
             e1Change,
             e1Change,
             axis,
-            -v1Dot * (1.0 + collisionCoefficient)
+            -v1Dot * (1.0 + collisionCoefficient),
           );
           vec3.scaleAndAdd(e1Change, e1Change, eN, -frictionMagnitude);
         }
@@ -175,7 +175,7 @@ export namespace CollisionSolver {
     }
 
     let displacement = CollisionSolver.getTranslationNeeded(
-      intersectionInformation
+      intersectionInformation,
     );
     let totalMass = po1.mass + po2.mass;
     let po1Part = 0.5;
@@ -199,7 +199,7 @@ export namespace CollisionSolver {
 
     if (!po2.isImmovable && !po2.isStatic) {
       po2.transform.translate(
-        vec3.scale(vec3.create(), displacement, -po2Part)
+        vec3.scale(vec3.create(), displacement, -po2Part),
       );
     }
   }

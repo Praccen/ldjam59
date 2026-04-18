@@ -28,7 +28,7 @@ export default class PhysicsScene {
     this.gravity = vec3.fromValues(0.0, -9.8, 0.0);
     this.physicsObjects = new Array<PhysicsObject>();
     this.tree = new Tree(
-      new TreeNode(100, vec3.fromValues(0, 0, 0), 40, 50, [true, false, true])
+      new TreeNode(100, vec3.fromValues(0, 0, 0), 40, 50, [true, false, true]),
     );
   }
 
@@ -39,7 +39,7 @@ export default class PhysicsScene {
    */
   addNewPhysicsObject(
     transform?: Transform,
-    physicsObject?: PhysicsObject
+    physicsObject?: PhysicsObject,
   ): PhysicsObject {
     let length = -1;
     if (physicsObject != undefined) {
@@ -49,7 +49,7 @@ export default class PhysicsScene {
     }
 
     const treeContent = new TreePhysicsContentElement(
-      this.physicsObjects[length - 1]
+      this.physicsObjects[length - 1],
     );
     this.tree.addContent(treeContent);
 
@@ -72,7 +72,7 @@ export default class PhysicsScene {
     ray: Ray,
     ignoreNonCollidableObjects = false,
     ignoreObjectsList: PhysicsObject[] = [],
-    maxDistance: number = Infinity
+    maxDistance: number = Infinity,
   ): { distance: number; object: PhysicsObject } {
     let treeContentToTestAgainst = new Array<TreePhysicsContentElement>();
     this.tree.getContentForRayCast(ray, treeContentToTestAgainst, maxDistance);
@@ -101,7 +101,7 @@ export default class PhysicsScene {
       let hit = IntersectionTester.doRayCast(
         ray,
         [treeContent.physicsObject.boundingBox],
-        Math.min(maxDistance, closestHit)
+        Math.min(maxDistance, closestHit),
       );
       if (closestHit > hit) {
         if (treeContent.physicsObject.internalTree != undefined) {
@@ -109,8 +109,8 @@ export default class PhysicsScene {
           ray.setInverseMatrix(
             mat4.invert(
               mat4.create(),
-              treeContent.physicsObject.transform.matrix
-            )
+              treeContent.physicsObject.transform.matrix,
+            ),
           );
 
           // get the shapes in the internal tree that intersects with the ray
@@ -119,7 +119,7 @@ export default class PhysicsScene {
           treeContent.physicsObject.internalTree.getContentForRayCast(
             ray,
             internalTreeContentToTestAgainst,
-            Math.min(maxDistance, closestHit)
+            Math.min(maxDistance, closestHit),
           );
 
           hit = IntersectionTester.doRayCast(
@@ -127,7 +127,7 @@ export default class PhysicsScene {
             internalTreeContentToTestAgainst.map((value) => {
               return value.shape;
             }),
-            Math.min(maxDistance, closestHit)
+            Math.min(maxDistance, closestHit),
           );
 
           // reset the inverse matrix for the ray
@@ -147,7 +147,7 @@ export default class PhysicsScene {
   update(
     dt: number,
     updateStaticObjects: boolean = false,
-    calculatePhysics: boolean = true
+    calculatePhysics: boolean = true,
   ) {
     // Update all bounding boxes
     for (let physicsObject of this.physicsObjects) {
@@ -178,7 +178,7 @@ export default class PhysicsScene {
         let otherObjects = new Array<TreePhysicsContentElement>();
         this.tree.getContentFromIntersection(
           [physicsObject.boundingBox],
-          otherObjects
+          otherObjects,
         );
 
         for (let otherObject of otherObjects) {
@@ -193,7 +193,7 @@ export default class PhysicsScene {
           if (
             !IntersectionTester.identifyIntersection(
               [physicsObject.boundingBox],
-              [otherObject.physicsObject.boundingBox]
+              [otherObject.physicsObject.boundingBox],
             )
           ) {
             continue;
@@ -212,25 +212,25 @@ export default class PhysicsScene {
 
             // set inverse matrix for otherObject.physicsObject.boundingBox to the one of physicsObject
             otherObject.physicsObject.boundingBox.setInverseMatrix(
-              mat4.invert(mat4.create(), physicsObject.transform.matrix)
+              mat4.invert(mat4.create(), physicsObject.transform.matrix),
             );
 
             // get the shapes in the tree that intersects with the bounding box of otherObject
             physicsObject.internalTree.getContentFromIntersection(
               [otherObject.physicsObject.boundingBox],
-              physicsObjectTestShapes
+              physicsObjectTestShapes,
             );
             // physicsObject.internalTree.getAllContent(physicsObjectTestShapes);
 
             for (let internalTreeNode of physicsObjectTestShapes) {
               internalTreeNode.shape.setTransformMatrix(
-                physicsObject.transform.matrix
+                physicsObject.transform.matrix,
               );
             }
 
             // reset the inverse matrix for the otherObject bounding box
             otherObject.physicsObject.boundingBox.setInverseMatrix(
-              mat4.create()
+              mat4.create(),
             );
           }
 
@@ -241,20 +241,20 @@ export default class PhysicsScene {
             physicsObject.boundingBox.setInverseMatrix(
               mat4.invert(
                 mat4.create(),
-                otherObject.physicsObject.transform.matrix
-              )
+                otherObject.physicsObject.transform.matrix,
+              ),
             );
 
             // get the shapes in the tree that intersects with the bounding box of physicsObject
             otherObject.physicsObject.internalTree.getContentFromIntersection(
               [physicsObject.boundingBox],
-              otherObjectTestShapes
+              otherObjectTestShapes,
             );
             // otherObject.physicsObject.internalTree.getAllContent(otherObjectTestShapes);
 
             for (let internalTreeNode of otherObjectTestShapes) {
               internalTreeNode.shape.setTransformMatrix(
-                otherObject.physicsObject.transform.matrix
+                otherObject.physicsObject.transform.matrix,
               );
             }
 
@@ -270,7 +270,7 @@ export default class PhysicsScene {
             otherObjectTestShapes.map((value) => {
               return value.shape;
             }),
-            inf
+            inf,
           );
 
           if (physicsObject.internalTree != undefined) {
@@ -288,10 +288,10 @@ export default class PhysicsScene {
           if (inf.length > 0) {
             // Keep track of which collisions happened
             physicsObject.collisionsLastUpdate.add(
-              otherObject.physicsObject.physicsObjectId
+              otherObject.physicsObject.physicsObjectId,
             );
             otherObject.physicsObject.collisionsLastUpdate.add(
-              physicsObject.physicsObjectId
+              physicsObject.physicsObjectId,
             );
 
             if (
@@ -303,7 +303,7 @@ export default class PhysicsScene {
             CollisionSolver.handleCollision(
               inf,
               physicsObject,
-              otherObject.physicsObject
+              otherObject.physicsObject,
             );
           }
         }
@@ -316,26 +316,26 @@ export default class PhysicsScene {
             physicsObject.velocity,
             physicsObject.velocity,
             this.gravity,
-            dt
+            dt,
           );
         }
         vec3.scaleAndAdd(
           physicsObject.velocity,
           physicsObject.velocity,
           physicsObject.force,
-          dt / physicsObject.mass
+          dt / physicsObject.mass,
         );
         vec3.scaleAndAdd(
           physicsObject.velocity,
           physicsObject.velocity,
           physicsObject.impulse,
-          1.0 / physicsObject.mass
+          1.0 / physicsObject.mass,
         );
         vec3.scaleAndAdd(
           physicsObject.velocity,
           physicsObject.velocity,
           physicsObject.velocity,
-          -1.0 * physicsObject.drag * dt
+          -1.0 * physicsObject.drag * dt,
         );
 
         vec3.zero(physicsObject.force);
@@ -344,7 +344,7 @@ export default class PhysicsScene {
         let translation = vec3.scale(
           vec3.create(),
           vec3.add(vec3.create(), oldVelocity, physicsObject.velocity),
-          0.5 * dt
+          0.5 * dt,
         );
         if (vec3.len(translation) > 0.001) {
           physicsObject.transform.translate(translation);

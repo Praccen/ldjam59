@@ -69,12 +69,12 @@ export default class Player {
       this.physicsObject.transform.position = vec3.transformMat4(
         vec3.create(),
         vec3.create(),
-        this.connectedBlock.graphicsBundle.transform.matrix
+        this.connectedBlock.graphicsBundle.transform.matrix,
       );
 
       this.physicsObject.transform.rotation = mat4.getRotation(
         quat.create(),
-        this.connectedBlock.graphicsBundle.transform.matrix
+        this.connectedBlock.graphicsBundle.transform.matrix,
       );
     }
 
@@ -86,11 +86,11 @@ export default class Player {
     vec3.transformQuat(
       camOffset,
       camOffset,
-      this.physicsObject.transform.rotation
+      this.physicsObject.transform.rotation,
     );
 
     camera.setPosition(
-      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
+      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset),
     );
 
     camera.setPitchJawDegrees(this.pitch, this.jaw);
@@ -120,9 +120,9 @@ export default class Player {
         vec3.transformQuat(
           vec3.create(),
           vec3.fromValues(0.0, 1.0, 0.0),
-          this.physicsObject.transform.rotation
+          this.physicsObject.transform.rotation,
         ),
-        jumpForce
+        jumpForce,
       );
     }
 
