@@ -1,7 +1,7 @@
 import { vec2, vec3, quat, mat4 } from "gl-matrix";
 import { Camera, PhysicsObject, PhysicsScene } from "praccen-web-engine";
 import { Input } from "./Input";
-import { Block } from "./Platform";
+import { BlockType, Platform } from "./Platform";
 
 const acceleration: number = 20.0;
 const jumpForce: number = 1.5;
@@ -17,6 +17,7 @@ export default class Player {
 
   private mouseWasClicked: boolean = false;
   private connectedBlock: Block = null;
+  private mouseRightWasClicked: boolean = false;
 
   constructor(physicsScene: PhysicsScene) {
     this.physicsObject = physicsScene.addNewPhysicsObject();
@@ -46,7 +47,7 @@ export default class Player {
     this.connectedBlock = block;
   }
 
-  update(dt: number, camera: Camera) {
+  update(dt: number, camera: Camera, platform: Platform) {
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
     if (document.pointerLockElement == document.body) {
@@ -119,5 +120,26 @@ export default class Player {
     let up = vec3.fromValues(0.0, 1.0, 0.0);
     vec3.transformQuat(up, up, this.physicsObject.transform.rotation);
     camera.setUp(up);
+    if (Input.mouseClicked) {
+      if (!this.mouseWasClicked) {
+        platform.placeBlockFromRayCast(BlockType.FLOOR, camera, this);
+      }
+
+      this.mouseWasClicked = true;
+    }
+    else {
+      this.mouseWasClicked = false;
+    }
+
+    if (Input.mouseRightClicked) {
+      if (!this.mouseRightWasClicked) {
+        platform.removeBlockFromRayCast(camera, this);
+      }
+
+      this.mouseRightWasClicked = true;
+    }
+    else {
+      this.mouseRightWasClicked = false;
+    }
   }
 }

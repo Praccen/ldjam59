@@ -122,7 +122,7 @@ export default class Game {
     this.guiRenderer.setSize(width, height);
   }
 
-  onExit() {}
+  onExit() { }
 
   update(dt: number) {
     this.gameTimer += dt;
@@ -152,7 +152,7 @@ export default class Game {
       );
     }
 
-    this.player.update(dt, this.camera);
+    this.player.update(dt, this.camera, this.testPlatform);
 
     this.physicsScene.update(dt);
   }

@@ -2,6 +2,7 @@ import { Div, GUIRenderer, Renderer3D, vec2 } from "praccen-web-engine";
 import Game from "./Game.js";
 import { Input } from "../Input.js";
 import MetaGUI from "../GUI/MetaGUI.js";
+import GameGUI from "../GUI/GameGUI.js";
 
 export let sensitivity = 1.0;
 
@@ -11,6 +12,7 @@ export default class GameContext {
 
   game: Game;
   metaGui: MetaGUI;
+  gameGui: GameGUI;
 
   constructor() {
     // Create a renderer and attach it to the document body
@@ -30,6 +32,7 @@ export default class GameContext {
     this.game = new Game(this.renderer, this.guiRenderer);
 
     this.metaGui = new MetaGUI(this.guiRenderer);
+    this.gameGui = new GameGUI(this.guiRenderer);
   }
 
   resize(width: number, height: number) {
