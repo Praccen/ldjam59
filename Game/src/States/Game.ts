@@ -38,6 +38,7 @@ export default class Game {
     this.renderer.setFogDensity(0.03);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
+    this.renderer.setSkybox("Assets/Skybox");
 
     // Create a camera and set it's starting position
     this.camera = new Camera();
