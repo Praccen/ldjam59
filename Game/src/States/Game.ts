@@ -21,7 +21,6 @@ export default class Game {
 
   camera: Camera = new Camera();
   scene: Scene = null;
-  scene2: Scene = null;
 
   player: Player;
   physicsScene: PhysicsScene;
@@ -53,16 +52,6 @@ export default class Game {
 
   createLevel() {
     this.scene = new Scene(this.renderer);
-    this.scene2 = new Scene(this.renderer);
-
-    this.scene2.directionalLight.direction =
-      this.scene.directionalLight.direction;
-
-    this.scene2.addNewMesh(
-      "Assets/objs/cube.obj",
-      "CSS:rgb(255,0,0)",
-      "CSS:rgb(0,0,0)"
-    );
 
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
@@ -72,7 +61,7 @@ export default class Game {
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 10000.0;
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
 
     this.scene
       .addNewMesh(
@@ -141,9 +130,6 @@ export default class Game {
 
   draw() {
     this.renderer.render(this.scene, this.camera, this.camera.getFrustum());
-    this.renderer.isOverlay = true;
-    this.renderer.render(this.scene2, this.camera, this.camera.getFrustum());
-    this.renderer.isOverlay = false;
 
     this.guiRenderer.draw(this.camera);
   }
