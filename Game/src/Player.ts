@@ -18,6 +18,8 @@ export default class Player {
 
   private mouseWasClicked: boolean = false;
   private connectedBlock: Block = null;
+  private movingToNewBlock: boolean = false;
+  private lerpSpeed: number = 2.5;
   private mouseRightWasClicked: boolean = false;
 
   constructor(physicsScene: PhysicsScene) {
@@ -45,8 +47,14 @@ export default class Player {
     };
   }
 
-  setConnectedBlock(block: Block) {
+  setConnectedBlock(block: Block, lerp: boolean = true) {
     this.connectedBlock = block;
+    this.movingToNewBlock = lerp;
+    if (block != null) {
+      this.physicsObject.isImmovable = true;
+    } else {
+      this.physicsObject.isImmovable = false;
+    }
   }
 
   update(dt: number, camera: Camera, platform: Platform) {
@@ -62,21 +70,34 @@ export default class Player {
 
     this.handleInput(camera, platform);
 
-    // Set position from connected block
-    if (this.connectedBlock != null) {
-      this.physicsObject.transform.position = vec3.transformMat4(
-        vec3.create(),
-        vec3.create(),
-        this.connectedBlock.graphicsBundle.transform.matrix
-      );
-
-      this.physicsObject.transform.rotation = mat4.getRotation(
-        quat.create(),
-        this.connectedBlock.graphicsBundle.transform.matrix
-      );
-    }
+    this.setPositionFromBlock(dt);
 
     this.updateCamera(camera);
+  }
+
+  setPositionFromBlock(dt: number) {
+    if (this.connectedBlock != null) {
+      const targetPos = this.connectedBlock.getWorldPos();
+      if (this.movingToNewBlock) {
+        const t = 1.0 - Math.exp(-this.lerpSpeed * dt);
+        vec3.lerp(
+          this.physicsObject.transform.position,
+          this.physicsObject.transform.position,
+          targetPos,
+          t,
+        );
+
+        if (
+          vec3.distance(this.physicsObject.transform.position, targetPos) <= 0.5
+        ) {
+          this.movingToNewBlock = false;
+        }
+      } else {
+        this.physicsObject.transform.position = targetPos;
+      }
+
+      this.physicsObject.transform.rotation = this.connectedBlock.getWorldRot();
+    }
   }
 
   updateCamera(camera: Camera) {
@@ -84,11 +105,11 @@ export default class Player {
     vec3.transformQuat(
       camOffset,
       camOffset,
-      this.physicsObject.transform.rotation
+      this.physicsObject.transform.rotation,
     );
 
     camera.setPosition(
-      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
+      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset),
     );
 
     camera.setPitchJawDegrees(this.pitch, this.jaw);
@@ -103,39 +124,38 @@ export default class Player {
 
   handleInput(camera: Camera, platform: Platform) {
     // Move to block ad point
-    if (Input.keys["E"]) {
+    if (!this.movingToNewBlock && Input.keys["E"]) {
       let ray = new Ray();
       ray.setStartAndDir(camera.getPosition(), camera.getDir());
       let hit = this.physicsScene.doRayCast(
         ray,
         true,
-        [this.physicsObject],
-        100.0
+        [this.physicsObject, this.connectedBlock.physicsObject],
+        3.0,
       );
       if (hit.object == undefined) {
         return;
       }
 
-      console.debug("Got hit", hit);
       let block = platform.getBlockFromPhysicsObject(hit.object);
       if (block) {
         this.setConnectedBlock(block);
-        console.debug("Moving to block", block);
       }
     }
 
     // Jump off platform
     if (Input.keys[" "] && this.connectedBlock != null) {
-      this.setConnectedBlock(null);
+      this.connectedBlock = null;
+      this.movingToNewBlock = false;
       vec3.scaleAndAdd(
         this.physicsObject.impulse,
         this.physicsObject.impulse,
         vec3.transformQuat(
           vec3.create(),
           vec3.fromValues(0.0, 1.0, 0.0),
-          this.physicsObject.transform.rotation
+          this.physicsObject.transform.rotation,
         ),
-        jumpForce
+        jumpForce,
       );
     }
 

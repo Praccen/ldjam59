@@ -50,7 +50,7 @@ export {
 };
 
 // Tooling
-export { WorldEditor, addNewConsoleCommand, Vec3Lerp as Vec3Slerp };
+export { WorldEditor, addNewConsoleCommand, Vec3Lerp };
 
 // Global exports
 export let applicationStartTime = Date.now();

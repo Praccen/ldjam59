@@ -37,6 +37,19 @@ export class Block {
     this.physicsObject.isImmovable = true;
     this.type = type;
   }
+  getWorldPos(): vec3 {
+    return vec3.transformMat4(
+      vec3.create(),
+      vec3.create(),
+      this.graphicsBundle.transform.matrix,
+    );
+  }
+  getWorldRot(): quat {
+    return mat4.getRotation(
+      quat.create(),
+      this.graphicsBundle.transform.matrix,
+    );
+  }
 }
 
 export class Platform {
@@ -67,7 +80,7 @@ export class Platform {
       this.addBlock(vec3.fromValues(0, 0, 1), BlockType.TEST);
       this.addBlock(vec3.fromValues(0, 1, 1), BlockType.TEST);
       if (player) {
-        player.setConnectedBlock(this.baseBlock);
+        player.setConnectedBlock(this.baseBlock, false);
       }
     });
   }
