@@ -55,10 +55,15 @@ export default class Game {
     this.scene = new Scene(this.renderer);
     this.scene2 = new Scene(this.renderer);
 
-    this.scene2.directionalLight.direction = this.scene.directionalLight.direction;
+    this.scene2.directionalLight.direction =
+      this.scene.directionalLight.direction;
 
-    this.scene2.addNewMesh("Assets/objs/cube.obj", "CSS:rgb(255,0,0)", "CSS:rgb(0,0,0)");
-    
+    this.scene2.addNewMesh(
+      "Assets/objs/cube.obj",
+      "CSS:rgb(255,0,0)",
+      "CSS:rgb(0,0,0)"
+    );
+
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
     this.player = new Player(this.physicsScene);

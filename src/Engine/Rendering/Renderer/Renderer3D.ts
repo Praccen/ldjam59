@@ -320,10 +320,7 @@ export default class Renderer3D extends RendererBase {
     );
 
     if (this.isOverlay) {
-      this.gl.clear(
-          this.gl.DEPTH_BUFFER_BIT |
-          this.gl.STENCIL_BUFFER_BIT
-      );
+      this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
     } else {
       this.gl.clear(
         this.gl.COLOR_BUFFER_BIT |
