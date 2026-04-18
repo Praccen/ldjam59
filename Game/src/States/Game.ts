@@ -34,7 +34,10 @@ export default class Game {
     this.guiRenderer = guiRenderer;
 
     this.renderer.useVolumetric = true;
-    this.renderer.setFogTexture("Assets/Textures/Fog.png");
+    this.renderer.setFogTexture("CSS:rgb(255, 255, 255)");
+    this.renderer.setFogDensity(0.03);
+    this.renderer.setFogBlur(true);
+    this.renderer.setFogRenderScale(0.5);
 
     // Create a camera and set it's starting position
     this.camera = new Camera();
@@ -51,14 +54,11 @@ export default class Game {
     vec3.zero(this.physicsScene.gravity);
     this.player = new Player(this.physicsScene);
 
-    vec3.set(this.scene.getDirectionalLight().colour, 1.0, 1.0, 1.0);
+    vec3.set(this.scene.getDirectionalLight().colour, 1.0, 1.0, 0.5);
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
-    this.renderer.setFogDensity(0.1);
-    this.renderer.setFogBlur(true);
-    this.renderer.setFogRenderScale(0.5);
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 10000.0;
 
     this.scene
       .addNewMesh(

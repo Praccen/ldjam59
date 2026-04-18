@@ -32,7 +32,7 @@ export default class DirectionalShadowRenderPass {
     this.directionalShadowSkeletalAnimationShaderProgram =
       directionalShadowSkeletalAnimationShaderProgram;
     // ---- Shadow mapping ----
-    this.shadowResolution = 1600;
+    this.shadowResolution = 3200;
     this.shadowBuffer = new Framebuffer(
       this.gl,
       this.shadowResolution,

@@ -18,7 +18,7 @@ export default class GameContext {
     document.body.appendChild(this.renderer.domElement);
 
     this.renderer.useVolumetric = true;
-    this.renderer.setFogTexture("Assets/Textures/Fog.png");
+    // this.renderer.setFogTexture("Assets/Textures/Fog.png");
 
     // Create a GUI renderer and attach it to the document body
     this.guiRenderer = new GUIRenderer();
@@ -45,7 +45,7 @@ export default class GameContext {
     loaded: number;
   }): Promise<void> {
     return new Promise<void>((resolve, rejects) => {
-      let meshes = ["Assets/objs/cube.obj"];
+      let meshes = ["Assets/objs/cube.obj", "Assets/objs/sphere.obj"];
       progress.requested = meshes.length;
 
       this.renderer.meshStore.loadMeshes(meshes, progress).then(() => {
