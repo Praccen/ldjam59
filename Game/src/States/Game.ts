@@ -122,7 +122,7 @@ export default class Game {
     this.guiRenderer.setSize(width, height);
   }
 
-  onExit() { }
+  onExit() {}
 
   update(dt: number) {
     this.gameTimer += dt;
