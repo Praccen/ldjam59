@@ -5,6 +5,7 @@ import {
   GUIRenderer,
   PhysicsObject,
   PhysicsScene,
+  quat,
   Renderer3D,
   Scene,
   Transform,
@@ -14,6 +15,7 @@ import { Input } from "../Input.js";
 import { sensitivity } from "./GameContext.js";
 import { gameContext } from "../main.js";
 import Player from "../Player.js";
+import { Platform } from "../Platform.js";
 
 export default class Game {
   private renderer: Renderer3D;
@@ -28,6 +30,7 @@ export default class Game {
   private gameTimer = 0.0;
 
   private sun: GraphicsBundle;
+  private testPlatform: Platform;
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
     this.renderer = renderer;
@@ -72,10 +75,9 @@ export default class Game {
       .then((gb) => {
         vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
-        // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
       });
 
-     this.scene
+    this.scene
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "CSS:rgba(118, 228, 255, 0.3)",
@@ -84,9 +86,7 @@ export default class Game {
       .then((gb) => {
         vec3.set(gb.transform.scale, 1020.0, 1030.0, 1030.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
-        // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
       });
-    
 
     this.scene
       .addNewMesh(
@@ -102,6 +102,12 @@ export default class Game {
         );
         this.sun = gb;
       });
+
+    this.testPlatform = new Platform(
+      this.scene,
+      this.physicsScene,
+      vec3.fromValues(0.0, 0.0, 2.0)
+    );
   }
 
   resize(width: number, height: number) {
@@ -124,6 +130,14 @@ export default class Game {
         Math.sin(this.gameTimer) * 20000,
         Math.cos(this.gameTimer) * 20000.0,
         -200.0 + Math.sin(this.gameTimer) * 20000.0
+      );
+    }
+
+    if (this.testPlatform != undefined) {
+      quat.rotateX(
+        this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
+        this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
+        0.5 * dt
       );
     }
 

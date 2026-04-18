@@ -314,7 +314,7 @@ export default class Renderer3D extends RendererBase {
       this.clearColour.b,
       this.clearColour.a
     );
-    
+
     this.gl.clear(
       this.gl.COLOR_BUFFER_BIT |
         this.gl.DEPTH_BUFFER_BIT |
