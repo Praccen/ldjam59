@@ -45,7 +45,7 @@ export default class PointLight {
       this.pointShadowDepthMap
     );
   }
-  
+
   reset() {
     this.position = vec3.fromValues(0.0, 0.0, 0.0);
     this.offset = vec3.fromValues(0.0, 0.0, 0.0);

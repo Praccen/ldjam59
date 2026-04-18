@@ -45,9 +45,7 @@ export default class GameContext {
     loaded: number;
   }): Promise<void> {
     return new Promise<void>((resolve, rejects) => {
-      let meshes = [
-        "Assets/objs/cube.obj",
-      ];
+      let meshes = ["Assets/objs/cube.obj"];
       progress.requested = meshes.length;
 
       this.renderer.meshStore.loadMeshes(meshes, progress).then(() => {

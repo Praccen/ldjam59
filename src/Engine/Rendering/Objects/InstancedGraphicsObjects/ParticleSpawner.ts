@@ -24,8 +24,8 @@ function getDefaultModifier(): Modifier {
     degreesMax: 360.0,
     amplitudeMin: 0.0,
     amplitudeMax: 0.0,
-    keyframes: []
-  }
+    keyframes: [],
+  };
 }
 
 type OptionalModifier = {
@@ -39,26 +39,26 @@ type OptionalModifier = {
   keyframes?: vec3[];
 };
 
-function applyOptionalModifierOnModifier(modifier: Modifier, optionalModifier: OptionalModifier) {
-  modifier.boxMin =
-    optionalModifier.boxMin ?? modifier.boxMin;
-  modifier.boxMax =
-    optionalModifier.boxMax ?? modifier.boxMax;
-  modifier.direction =
-    optionalModifier.direction ?? modifier.direction;
-  modifier.degreesMin =
-    optionalModifier.degreesMin ?? modifier.degreesMin;
-  modifier.degreesMax =
-    optionalModifier.degreesMax ?? modifier.degreesMax;
+function applyOptionalModifierOnModifier(
+  modifier: Modifier,
+  optionalModifier: OptionalModifier
+) {
+  modifier.boxMin = optionalModifier.boxMin ?? modifier.boxMin;
+  modifier.boxMax = optionalModifier.boxMax ?? modifier.boxMax;
+  modifier.direction = optionalModifier.direction ?? modifier.direction;
+  modifier.degreesMin = optionalModifier.degreesMin ?? modifier.degreesMin;
+  modifier.degreesMax = optionalModifier.degreesMax ?? modifier.degreesMax;
   modifier.amplitudeMin =
     optionalModifier.amplitudeMin ?? modifier.amplitudeMin;
   modifier.amplitudeMax =
     optionalModifier.amplitudeMax ?? modifier.amplitudeMax;
-  modifier.keyframes =
-    optionalModifier.keyframes ?? modifier.keyframes;
+  modifier.keyframes = optionalModifier.keyframes ?? modifier.keyframes;
 }
 
-function randomizeBasedOnModifier(modifier: Modifier, keyframeProgress: number): vec3 {
+function randomizeBasedOnModifier(
+  modifier: Modifier,
+  keyframeProgress: number
+): vec3 {
   let returnVector = vec3.create();
   if (modifier.amplitudeMin != 0.0 || modifier.amplitudeMax != 0.0) {
     vec3.transformQuat(
@@ -95,7 +95,8 @@ function randomizeBasedOnModifier(modifier: Modifier, keyframeProgress: number):
   );
 
   if (modifier.keyframes.length > 0) {
-    let indexProgress = (Math.max(0.0, keyframeProgress) % 1.0) * (modifier.keyframes.length - 1);
+    let indexProgress =
+      (Math.max(0.0, keyframeProgress) % 1.0) * (modifier.keyframes.length - 1);
     let lower = Math.floor(indexProgress);
     let upper = lower + 1;
     let progressBetween = indexProgress - lower;
@@ -104,8 +105,18 @@ function randomizeBasedOnModifier(modifier: Modifier, keyframeProgress: number):
       upper = lower;
     }
 
-    vec3.scaleAndAdd(returnVector, returnVector, modifier.keyframes[lower], 1.0 - progressBetween);
-    vec3.scaleAndAdd(returnVector, returnVector, modifier.keyframes[upper], progressBetween);
+    vec3.scaleAndAdd(
+      returnVector,
+      returnVector,
+      modifier.keyframes[lower],
+      1.0 - progressBetween
+    );
+    vec3.scaleAndAdd(
+      returnVector,
+      returnVector,
+      modifier.keyframes[upper],
+      progressBetween
+    );
   }
 
   return returnVector;
@@ -124,9 +135,8 @@ export default class ParticleSpawner extends GraphicsObject {
   keyframeDuplicationFactor: number = 1.0;
   attachedPointLight: PointLight = null;
 
-
   // Below modifiers are applied when particles respawn in the update function
-  private _randomPositionModifier: Modifier = getDefaultModifier() // Relative to postion + offset
+  private _randomPositionModifier: Modifier = getDefaultModifier(); // Relative to postion + offset
   public get randomPositionModifier(): Modifier {
     return this._randomPositionModifier;
   }
@@ -419,19 +429,27 @@ export default class ParticleSpawner extends GraphicsObject {
 
     for (currentParticle; currentParticle < endParticle; currentParticle++) {
       const particleIndex = currentParticle % this.getNumberOfParticles();
-      const keyframeProgress = (particleIndex / this.getNumberOfParticles()) * this.keyframeDuplicationFactor;
+      const keyframeProgress =
+        (particleIndex / this.getNumberOfParticles()) *
+        this.keyframeDuplicationFactor;
       this.setParticleData(
         particleIndex,
         vec3.add(
           vec3.create(),
           vec3.add(vec3.create(), this.position, this.offset),
-          randomizeBasedOnModifier(this.randomPositionModifier, keyframeProgress)
+          randomizeBasedOnModifier(
+            this.randomPositionModifier,
+            keyframeProgress
+          )
         ),
         (this.randomSizeModifier.sizeMax - this.randomSizeModifier.sizeMin) *
           Math.random() +
           this.randomSizeModifier.sizeMin,
         randomizeBasedOnModifier(this.randomStartVelModifier, keyframeProgress),
-        randomizeBasedOnModifier(this.randomAccelerationModifier, keyframeProgress)
+        randomizeBasedOnModifier(
+          this.randomAccelerationModifier,
+          keyframeProgress
+        )
       );
     }
     while (this.resetTimer > this.lifeTime) {

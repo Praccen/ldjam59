@@ -52,7 +52,7 @@ export default class Game {
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0; 
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
     this.renderer.setFogDensity(0.2);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
@@ -67,9 +67,7 @@ export default class Game {
     this.guiRenderer.setSize(width, height);
   }
 
-  onExit() {
-
-  }
+  onExit() {}
 
   update(dt: number) {
     this.gameTimer += dt;
@@ -79,9 +77,7 @@ export default class Game {
     this.physicsScene.update(dt);
   }
 
-  preRenderingUpdate(dt: number) {
-
-  }
+  preRenderingUpdate(dt: number) {}
 
   draw() {
     this.renderer.render(this.scene, this.camera, this.camera.getFrustum());
