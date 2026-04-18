@@ -72,6 +72,25 @@ export class Platform {
     });
   }
 
+  resetWithNewBaseBlock(
+    graphicsBundle: GraphicsBundle,
+    physicsObject: PhysicsObject
+  ) {
+    this.attachedBlocks.clear();
+    this.physicsObjectIdToAttachedBlocksKey.clear();
+    this.baseBlock = new Block(graphicsBundle, physicsObject, BlockType.BASE);
+    this.baseBlock.physicsObject.isImmovable = true;
+    vec3.zero(this.baseBlock.physicsObject.impulse);
+    vec3.zero(this.baseBlock.physicsObject.force);
+    vec3.zero(this.baseBlock.physicsObject.velocity);
+
+    this.attachedBlocks.set(vec3.create().toString(), this.baseBlock);
+    this.physicsObjectIdToAttachedBlocksKey.set(
+      physicsObject.physicsObjectId,
+      vec3.create().toString()
+    );
+  }
+
   getBlockFromPhysicsObject(physicsObject: PhysicsObject): Block | undefined {
     if (
       !this.physicsObjectIdToAttachedBlocksKey.has(

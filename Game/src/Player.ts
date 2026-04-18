@@ -142,10 +142,10 @@ export default class Player {
     if (Input.keys["R"]) {
       platform.splitPlatform();
       if (this.connectedBlock != null) {
-        this.connectedBlock.physicsObject.isImmovable = true;
-        vec3.zero(this.connectedBlock.physicsObject.impulse);
-        vec3.zero(this.connectedBlock.physicsObject.force);
-        vec3.zero(this.connectedBlock.physicsObject.velocity);
+        platform.resetWithNewBaseBlock(
+          this.connectedBlock.graphicsBundle,
+          this.connectedBlock.physicsObject
+        );
       }
     }
 
