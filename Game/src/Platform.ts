@@ -36,7 +36,10 @@ export class Platform {
     string,
     Block
   >();
-  private physicsObjectIdToAttachedBlocksKey: Map<number, string> = new Map<number, string>();
+  private physicsObjectIdToAttachedBlocksKey: Map<number, string> = new Map<
+    number,
+    string
+  >();
 
   constructor(
     scene: Scene,
@@ -59,7 +62,10 @@ export class Platform {
         let physicsObject = this.physicsScene.addNewPhysicsObject(gb.transform);
         this.baseBlock = new Block(gb, physicsObject, BlockType.FLOOR);
         this.attachedBlocks.set(vec3.create().toString(), this.baseBlock);
-        this.physicsObjectIdToAttachedBlocksKey.set(physicsObject.physicsObjectId, vec3.create().toString());
+        this.physicsObjectIdToAttachedBlocksKey.set(
+          physicsObject.physicsObjectId,
+          vec3.create().toString()
+        );
 
         this.addBlock(vec3.fromValues(1, 0, 0), BlockType.TEST);
         this.addBlock(vec3.fromValues(0, 0, 1), BlockType.TEST);
@@ -68,11 +74,19 @@ export class Platform {
   }
 
   getBlockFromPhysicsObject(physicsObject: PhysicsObject): Block | undefined {
-    if (!this.physicsObjectIdToAttachedBlocksKey.has(physicsObject.physicsObjectId)) {
-        return undefined;
+    if (
+      !this.physicsObjectIdToAttachedBlocksKey.has(
+        physicsObject.physicsObjectId
+      )
+    ) {
+      return undefined;
     }
 
-    return this.attachedBlocks.get(this.physicsObjectIdToAttachedBlocksKey.get(physicsObject.physicsObjectId) ?? "");
+    return this.attachedBlocks.get(
+      this.physicsObjectIdToAttachedBlocksKey.get(
+        physicsObject.physicsObjectId
+      ) ?? ""
+    );
   }
 
   addBlock(offset: vec3, type: BlockType) {
@@ -100,19 +114,23 @@ export class Platform {
           offset.toString(),
           new Block(gb, physicsObject, type)
         );
-        this.physicsObjectIdToAttachedBlocksKey.set(physicsObject.physicsObjectId, offset.toString());
+        this.physicsObjectIdToAttachedBlocksKey.set(
+          physicsObject.physicsObjectId,
+          offset.toString()
+        );
       });
   }
 
   removeBlock(offset: vec3) {
     if (!this.attachedBlocks.has(offset.toString())) {
-        return;
+      return;
     }
     let block = this.attachedBlocks.get(offset.toString())!;
-    this.physicsObjectIdToAttachedBlocksKey.delete(block.physicsObject.physicsObjectId);
+    this.physicsObjectIdToAttachedBlocksKey.delete(
+      block.physicsObject.physicsObjectId
+    );
     this.physicsScene.removePhysicsObject(block.physicsObject);
     this.scene.deleteGraphicsBundle(block.graphicsBundle);
     this.attachedBlocks.delete(offset.toString());
-
   }
 }

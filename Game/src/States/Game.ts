@@ -136,7 +136,11 @@ export default class Game {
     }
 
     if (this.planet != undefined) {
-      quat.rotateZ(this.planet.transform.rotation, this.planet.transform.rotation, 0.01 * dt);
+      quat.rotateZ(
+        this.planet.transform.rotation,
+        this.planet.transform.rotation,
+        0.01 * dt
+      );
     }
 
     if (this.testPlatform != undefined) {
