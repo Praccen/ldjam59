@@ -20,7 +20,7 @@ export default class LoadingScreen {
     this.loadingScreenDiv.getElement().style.height = "100%";
 
     this.loadingScreenDiv.getElement().style.backgroundImage =
-      "url(Assets/Textures/Lava2.png)";
+      "url(Assets/Textures/Lava1.png)";
 
     this.text = this.guiRenderer.getNew2DText(this.loadingScreenDiv);
     this.text.textString = "Praccen's web engine is loading";

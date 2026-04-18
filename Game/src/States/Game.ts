@@ -36,7 +36,7 @@ export default class Game {
     // Create a camera and set it's starting position
     this.camera = new Camera();
     this.camera.setPosition(vec3.fromValues(4.0, 4.0, 7.0));
-    this.camera.setFarPlaneDistance(150);
+    this.camera.setFarPlaneDistance(100000);
     this.camera.setFOV(80);
 
     this.createLevel();
@@ -52,10 +52,22 @@ export default class Game {
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
-    this.renderer.setFogDensity(0.2);
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0; 
+    this.renderer.setFogDensity(0.1);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
+
+    this.scene.addNewMesh("Assets/objs/sphere.obj", "CSS:rgb(155, 0, 0)", "CSS:rgb(0,0,0)").then((gb) => {
+      vec3.set(gb.transform.scale, 100.0, 100.0, 100.0);
+      vec3.set(gb.transform.position, 0.0, -100.0, 100.0);
+      // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
+    });
+
+    this.scene.addNewMesh("Assets/objs/sphere.obj", "CSS:rgb(233, 224, 64)", "CSS:rgb(0,0,0)").then((gb) => {
+      vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
+      vec3.set(gb.transform.position, 0.0, 10000.0, 10000.0);
+      gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(233, 224, 64)");
+    });
   }
 
   resize(width: number, height: number) {
