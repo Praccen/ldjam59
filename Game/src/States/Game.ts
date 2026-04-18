@@ -1,6 +1,7 @@
 import {
   Camera,
   Frustum,
+  GraphicsBundle,
   GUIRenderer,
   PhysicsObject,
   PhysicsScene,
@@ -25,6 +26,8 @@ export default class Game {
   physicsScene: PhysicsScene;
 
   private gameTimer = 0.0;
+
+  private sun: GraphicsBundle = null;
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
     this.renderer = renderer;
@@ -65,8 +68,9 @@ export default class Game {
 
     this.scene.addNewMesh("Assets/objs/sphere.obj", "CSS:rgb(233, 224, 64)", "CSS:rgb(0,0,0)").then((gb) => {
       vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
-      vec3.set(gb.transform.position, 0.0, 10000.0, 10000.0);
+      vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
       gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(233, 224, 64)");
+      this.sun = gb;
     });
   }
 
@@ -84,12 +88,20 @@ export default class Game {
   update(dt: number) {
     this.gameTimer += dt;
 
+    if (this.sun != undefined) {
+      vec3.set(this.sun.transform.position, Math.sin(this.gameTimer) * 20000, Math.cos(this.gameTimer) * 20000.0, -200.0);
+    }
+
     this.player.update(dt, this.camera);
 
     this.physicsScene.update(dt);
   }
 
-  preRenderingUpdate(dt: number) {}
+  preRenderingUpdate(dt: number) {
+    if (this.scene != undefined && this.sun != undefined) {
+      vec3.normalize(this.scene.directionalLight.direction, vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position));
+    }
+  }
 
   draw() {
     this.renderer.render(this.scene, this.camera, this.camera.getFrustum());
