@@ -55,23 +55,37 @@ export default class Game {
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0; 
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
     this.renderer.setFogDensity(0.1);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
 
-    this.scene.addNewMesh("Assets/objs/sphere.obj", "CSS:rgb(155, 0, 0)", "CSS:rgb(0,0,0)").then((gb) => {
-      vec3.set(gb.transform.scale, 100.0, 100.0, 100.0);
-      vec3.set(gb.transform.position, 0.0, -100.0, 100.0);
-      // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
-    });
+    this.scene
+      .addNewMesh(
+        "Assets/objs/sphere.obj",
+        "CSS:rgb(155, 0, 0)",
+        "CSS:rgb(0,0,0)"
+      )
+      .then((gb) => {
+        vec3.set(gb.transform.scale, 100.0, 100.0, 100.0);
+        vec3.set(gb.transform.position, 0.0, -100.0, 100.0);
+        // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
+      });
 
-    this.scene.addNewMesh("Assets/objs/sphere.obj", "CSS:rgb(233, 224, 64)", "CSS:rgb(0,0,0)").then((gb) => {
-      vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
-      vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
-      gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(233, 224, 64)");
-      this.sun = gb;
-    });
+    this.scene
+      .addNewMesh(
+        "Assets/objs/sphere.obj",
+        "CSS:rgb(233, 224, 64)",
+        "CSS:rgb(0,0,0)"
+      )
+      .then((gb) => {
+        vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
+        vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
+        gb.emission = this.renderer.textureStore.getTexture(
+          "CSS:rgb(233, 224, 64)"
+        );
+        this.sun = gb;
+      });
   }
 
   resize(width: number, height: number) {
@@ -89,7 +103,12 @@ export default class Game {
     this.gameTimer += dt;
 
     if (this.sun != undefined) {
-      vec3.set(this.sun.transform.position, Math.sin(this.gameTimer) * 20000, Math.cos(this.gameTimer) * 20000.0, -200.0);
+      vec3.set(
+        this.sun.transform.position,
+        Math.sin(this.gameTimer) * 20000,
+        Math.cos(this.gameTimer) * 20000.0,
+        -200.0
+      );
     }
 
     this.player.update(dt, this.camera);
@@ -99,7 +118,10 @@ export default class Game {
 
   preRenderingUpdate(dt: number) {
     if (this.scene != undefined && this.sun != undefined) {
-      vec3.normalize(this.scene.directionalLight.direction, vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position));
+      vec3.normalize(
+        this.scene.directionalLight.direction,
+        vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position)
+      );
     }
   }
 
