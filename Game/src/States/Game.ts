@@ -20,14 +20,14 @@ export default class Game {
   guiRenderer: GUIRenderer;
 
   camera: Camera = new Camera();
-  scene: Scene = null;
+  scene: Scene;
 
   player: Player;
   physicsScene: PhysicsScene;
 
   private gameTimer = 0.0;
 
-  private sun: GraphicsBundle = null;
+  private sun: GraphicsBundle;
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
     this.renderer = renderer;
@@ -35,7 +35,7 @@ export default class Game {
 
     this.renderer.useVolumetric = true;
     this.renderer.setFogTexture("CSS:rgb(255, 255, 255)");
-    this.renderer.setFogDensity(0.03);
+    this.renderer.setFogDensity(0.2);
     this.renderer.setFogBlur(true);
     this.renderer.setFogRenderScale(0.5);
     this.renderer.setFogMaxDistance(100);
@@ -61,7 +61,7 @@ export default class Game {
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
-    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 1000.0;
+    this.scene.getDirectionalLight().lightProjectionBoxSideLength = 100.0;
 
     this.scene
       .addNewMesh(
@@ -70,10 +70,23 @@ export default class Game {
         "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
-        vec3.set(gb.transform.scale, 100.0, 100.0, 100.0);
-        vec3.set(gb.transform.position, 0.0, -100.0, 100.0);
+        vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
+        vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
         // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
       });
+
+     this.scene
+      .addNewMesh(
+        "Assets/objs/sphere.obj",
+        "CSS:rgba(118, 228, 255, 0.3)",
+        "CSS:rgb(0,0,0)"
+      )
+      .then((gb) => {
+        vec3.set(gb.transform.scale, 1020.0, 1030.0, 1030.0);
+        vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
+        // gb.emission = this.renderer.textureStore.getTexture("CSS:rgb(155, 0, 0)");
+      });
+    
 
     this.scene
       .addNewMesh(
@@ -82,7 +95,7 @@ export default class Game {
         "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
-        vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
+        vec3.set(gb.transform.scale, 500.0, 500.0, 500.0);
         vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
         gb.emission = this.renderer.textureStore.getTexture(
           "CSS:rgb(233, 224, 64)"
@@ -110,7 +123,7 @@ export default class Game {
         this.sun.transform.position,
         Math.sin(this.gameTimer) * 20000,
         Math.cos(this.gameTimer) * 20000.0,
-        -200.0
+        -200.0 + Math.sin(this.gameTimer) * 20000.0
       );
     }
 

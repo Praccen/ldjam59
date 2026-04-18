@@ -206,7 +206,7 @@ function getFragSrc() {
       vec4 dirLightResult = CalcDirectionalLight(directionalLight, lightSpaceFragPos, dir);
       if (dirLightResult.a > 0.0) {
         effectedCounter += 0.7;
-        tempResult += dirLightResult * fogMultiplier * 1.5;
+        tempResult += dirLightResult * fogMultiplier * 0.4;
       }
 
       for (int i = 0; i < nrOfPointLights; i++) {

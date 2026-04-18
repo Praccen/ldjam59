@@ -9,7 +9,8 @@
     "module": "ES2020",
     "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*"]
 }
