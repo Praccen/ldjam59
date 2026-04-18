@@ -71,7 +71,7 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "Assets/Textures/2k_mars.jpg",
-        "CSS:rgb(0,0,0)",
+        "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
@@ -83,7 +83,7 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "CSS:rgba(118, 228, 255, 0.3)",
-        "CSS:rgb(0,0,0)",
+        "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 1020.0, 1030.0, 1030.0);
@@ -94,13 +94,13 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "CSS:rgb(233, 224, 64)",
-        "CSS:rgb(0,0,0)",
+        "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 500.0, 500.0, 500.0);
         vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
         gb.emission = this.renderer.textureStore.getTexture(
-          "CSS:rgb(233, 224, 64)",
+          "CSS:rgb(233, 224, 64)"
         );
         this.sun = gb;
       });
@@ -109,7 +109,7 @@ export default class Game {
       this.scene,
       this.physicsScene,
       vec3.fromValues(0.0, 0.0, 2.0),
-      this.player,
+      this.player
     );
   }
 
@@ -132,7 +132,7 @@ export default class Game {
         this.sun.transform.position,
         Math.sin(this.gameTimer * 0.2) * 20000,
         Math.cos(this.gameTimer * 0.2) * 20000.0,
-        -200.0 + Math.sin(this.gameTimer * 0.2) * 20000.0,
+        -200.0 + Math.sin(this.gameTimer * 0.2) * 20000.0
       );
     }
 
@@ -140,15 +140,18 @@ export default class Game {
       quat.rotateZ(
         this.planet.transform.rotation,
         this.planet.transform.rotation,
-        0.01 * dt,
+        0.01 * dt
       );
     }
 
-    if (this.testPlatform != undefined) {
+    if (
+      this.testPlatform != undefined &&
+      this.testPlatform.baseBlock != undefined
+    ) {
       quat.rotateX(
         this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
         this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
-        0.1 * dt,
+        0.1 * dt
       );
     }
 
@@ -161,7 +164,7 @@ export default class Game {
     if (this.scene != undefined && this.sun != undefined) {
       vec3.normalize(
         this.scene.directionalLight.direction,
-        vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position),
+        vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position)
       );
     }
   }
