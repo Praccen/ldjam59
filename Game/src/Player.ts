@@ -1,6 +1,7 @@
-import { vec2, vec3 } from "gl-matrix";
+import { vec2, vec3, quat, mat4 } from "gl-matrix";
 import { Camera, PhysicsObject, PhysicsScene } from "praccen-web-engine";
 import { Input } from "./Input";
+import { Block } from "./Platform";
 
 const acceleration: number = 20.0;
 const jumpForce: number = 15.0;
@@ -15,6 +16,7 @@ export default class Player {
   jaw: number = 0.0;
 
   private mouseWasClicked: boolean = false;
+  private connectedBlock: Block = null;
 
   constructor(physicsScene: PhysicsScene) {
     this.physicsObject = physicsScene.addNewPhysicsObject();
@@ -38,6 +40,10 @@ export default class Player {
       this.mouseMovement[0] += movX;
       this.mouseMovement[1] += movY;
     };
+  }
+
+  setConnectedBlock(block: Block) {
+    this.connectedBlock = block;
   }
 
   update(dt: number, camera: Camera) {
@@ -65,12 +71,43 @@ export default class Player {
     //     this.mouseWasClicked = false;
     // }
 
-    camera.setPosition(
-      vec3.add(
+    // Jump off platform
+    if (Input.keys[" "]) {
+      this.setConnectedBlock(null);
+    }
+
+    // Set position from connected block
+    if (this.connectedBlock != null) {
+      this.physicsObject.transform.position = vec3.transformMat4(
         vec3.create(),
-        this.physicsObject.transform.position,
-        vec3.fromValues(0.0, 1.8, 0.0)
-      )
+        vec3.create(),
+        this.connectedBlock.graphicsBundle.transform.matrix
+      );
+
+      this.physicsObject.transform.rotation = mat4.getRotation(
+        quat.create(),
+        this.connectedBlock.graphicsBundle.transform.matrix
+      );
+    }
+
+    let camOffset = vec3.fromValues(0.0, 1.8, 0.0);
+    vec3.transformQuat(
+      camOffset,
+      camOffset,
+      this.physicsObject.transform.rotation
     );
+
+    camera.setPosition(
+      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
+    );
+
+    camera.setPitchJawDegrees(this.pitch, this.jaw);
+    let dir = vec3.clone(camera.getDir() as vec3);
+    vec3.transformQuat(dir, dir, this.physicsObject.transform.rotation);
+    camera.setDir(dir);
+
+    let up = vec3.fromValues(0.0, 1.0, 0.0);
+    vec3.transformQuat(up, up, this.physicsObject.transform.rotation);
+    camera.setUp(up);
   }
 }

@@ -108,7 +108,8 @@ export default class Game {
     this.testPlatform = new Platform(
       this.scene,
       this.physicsScene,
-      vec3.fromValues(0.0, 0.0, 2.0)
+      vec3.fromValues(0.0, 0.0, 2.0),
+      this.player
     );
   }
 
@@ -147,7 +148,7 @@ export default class Game {
       quat.rotateX(
         this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
         this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
-        0.5 * dt
+        0.1 * dt
       );
     }
 

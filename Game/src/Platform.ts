@@ -5,13 +5,14 @@ import {
   Scene,
   vec3,
 } from "praccen-web-engine";
+import Player from "./Player";
 export enum BlockType {
   NONE,
   FLOOR,
   TEST,
 }
 
-class Block {
+export class Block {
   graphicsBundle: GraphicsBundle;
   physicsObject: PhysicsObject;
   type: BlockType;
@@ -44,7 +45,8 @@ export class Platform {
   constructor(
     scene: Scene,
     physicsScene: PhysicsScene,
-    baseBlockStartingPosition: vec3
+    baseBlockStartingPosition: vec3,
+    player?: Player
   ) {
     this.scene = scene;
     this.physicsScene = physicsScene;
@@ -70,6 +72,10 @@ export class Platform {
         this.addBlock(vec3.fromValues(1, 0, 0), BlockType.TEST);
         this.addBlock(vec3.fromValues(0, 0, 1), BlockType.TEST);
         this.addBlock(vec3.fromValues(0, 1, 1), BlockType.TEST);
+
+        if (player) {
+          player.setConnectedBlock(this.baseBlock);
+        }
       });
   }
 
