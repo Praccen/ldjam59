@@ -43,11 +43,13 @@ export default class Player {
   update(dt: number, camera: Camera) {
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
-    this.pitch -= mouseDiff[1] * sensitivity;
-    this.jaw -= mouseDiff[0] * sensitivity;
+    if (document.pointerLockElement == document.body) {
+      this.pitch -= mouseDiff[1] * sensitivity;
+      this.jaw -= mouseDiff[0] * sensitivity;
 
-    this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
-    this.jaw = this.jaw % 360;
+      this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
+      this.jaw = this.jaw % 360;
+    }
 
     camera.setPitchJawDegrees(this.pitch, this.jaw);
 
