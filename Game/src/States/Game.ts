@@ -30,6 +30,7 @@ export default class Game {
   private gameTimer = 0.0;
 
   private sun: GraphicsBundle;
+  private planet: GraphicsBundle;
   private testPlatform: Platform;
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
@@ -75,6 +76,7 @@ export default class Game {
       .then((gb) => {
         vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
+        this.planet = gb;
       });
 
     this.scene
@@ -131,6 +133,10 @@ export default class Game {
         Math.cos(this.gameTimer) * 20000.0,
         -200.0 + Math.sin(this.gameTimer) * 20000.0
       );
+    }
+
+    if (this.planet != undefined) {
+      quat.rotateZ(this.planet.transform.rotation, this.planet.transform.rotation, 0.01 * dt);
     }
 
     if (this.testPlatform != undefined) {
