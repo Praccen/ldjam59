@@ -4,7 +4,7 @@ import { Input } from "./Input";
 import { Block } from "./Platform";
 
 const acceleration: number = 20.0;
-const jumpForce: number = 15.0;
+const jumpForce: number = 1.5;
 const sensitivity: number = 0.4;
 
 export default class Player {
@@ -23,7 +23,7 @@ export default class Player {
     vec3.set(this.physicsObject.transform.scale, 1.0, 2.0, 1.0);
     vec3.set(this.physicsObject.transform.origin, 0.0, -0.5, 0.0);
     vec3.set(this.physicsObject.transform.position, 0.0, 1.0, 0.0);
-    this.physicsObject.drag = 2.0;
+    this.physicsObject.drag = 0.0;
 
     Input.mouseMoveCallBack = (event: MouseEvent) => {
       let movX = event.movementX;
@@ -72,8 +72,18 @@ export default class Player {
     // }
 
     // Jump off platform
-    if (Input.keys[" "]) {
+    if (Input.keys[" "] && this.connectedBlock != null) {
       this.setConnectedBlock(null);
+      vec3.scaleAndAdd(
+        this.physicsObject.impulse,
+        this.physicsObject.impulse,
+        vec3.transformQuat(
+          vec3.create(),
+          vec3.fromValues(0.0, 1.0, 0.0),
+          this.physicsObject.transform.rotation
+        ),
+        jumpForce
+      );
     }
 
     // Set position from connected block
