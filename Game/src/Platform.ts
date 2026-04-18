@@ -23,7 +23,7 @@ export class Block {
   constructor(
     graphicsBundle: GraphicsBundle,
     physicsObject: PhysicsObject,
-    type: BlockType
+    type: BlockType,
   ) {
     this.graphicsBundle = graphicsBundle;
     this.physicsObject = physicsObject;
@@ -50,7 +50,7 @@ export class Platform {
     scene: Scene,
     physicsScene: PhysicsScene,
     baseBlockStartingPosition: vec3,
-    player?: Player
+    player?: Player,
   ) {
     this.scene = scene;
     this.physicsScene = physicsScene;
@@ -60,7 +60,7 @@ export class Platform {
       .addNewMesh(
         "Assets/objs/cube.obj",
         "CSS:rgb(255, 0, 0)",
-        "CSS:rgb(0,0,0)"
+        "CSS:rgb(0,0,0)",
       )
       .then((gb) => {
         gb.transform.position = baseBlockStartingPosition;
@@ -69,7 +69,7 @@ export class Platform {
         this.attachedBlocks.set(vec3.create().toString(), this.baseBlock);
         this.physicsObjectIdToAttachedBlocksKey.set(
           physicsObject.physicsObjectId,
-          vec3.create().toString()
+          vec3.create().toString(),
         );
 
         this.addBlock(vec3.fromValues(1, 0, 0), BlockType.TEST);
@@ -85,7 +85,7 @@ export class Platform {
   getBlockFromPhysicsObject(physicsObject: PhysicsObject): Block | undefined {
     if (
       !this.physicsObjectIdToAttachedBlocksKey.has(
-        physicsObject.physicsObjectId
+        physicsObject.physicsObjectId,
       )
     ) {
       return undefined;
@@ -93,8 +93,8 @@ export class Platform {
 
     return this.attachedBlocks.get(
       this.physicsObjectIdToAttachedBlocksKey.get(
-        physicsObject.physicsObjectId
-      ) ?? ""
+        physicsObject.physicsObjectId,
+      ) ?? "",
     );
   }
 
@@ -111,7 +111,7 @@ export class Platform {
       .addNewMesh(
         "Assets/objs/cube.obj",
         "CSS:rgb(0, 255, 0)",
-        "CSS:rgb(0,0,0)"
+        "CSS:rgb(0,0,0)",
       )
       .then((gb) => {
         gb.transform.position = offset;
@@ -120,11 +120,11 @@ export class Platform {
 
         this.attachedBlocks.set(
           offset.toString(),
-          new Block(gb, physicsObject, type)
+          new Block(gb, physicsObject, type),
         );
         this.physicsObjectIdToAttachedBlocksKey.set(
           physicsObject.physicsObjectId,
-          offset.toString()
+          offset.toString(),
         );
       });
   }
@@ -136,7 +136,7 @@ export class Platform {
       ray,
       true,
       [player.physicsObject],
-      100.0
+      100.0,
     );
     if (hit.object == undefined) {
       return;
@@ -152,12 +152,12 @@ export class Platform {
       vec3.create(),
       camera.getPosition(),
       camera.getDir(),
-      hit.distance
+      hit.distance,
     );
     let hitPositionInLocalCoords = vec3.transformMat4(
       vec3.create(),
       hitPosition,
-      mat4.invert(mat4.create(), this.baseBlock.physicsObject.transform.matrix)
+      mat4.invert(mat4.create(), this.baseBlock.physicsObject.transform.matrix),
     );
 
     let diff = vec3.sub(
@@ -165,7 +165,7 @@ export class Platform {
       hitPositionInLocalCoords,
       hit.object.physicsObjectId == this.baseBlock.physicsObject.physicsObjectId
         ? vec3.create()
-        : hit.object.transform.position
+        : hit.object.transform.position,
     );
     let offsetComparedToHitObject = vec3.create();
     if (
@@ -174,7 +174,7 @@ export class Platform {
     ) {
       vec3.normalize(
         offsetComparedToHitObject,
-        vec3.set(diff, diff[0], 0.0, 0.0)
+        vec3.set(diff, diff[0], 0.0, 0.0),
       );
     } else if (
       Math.abs(diff[1]) > Math.abs(diff[0]) &&
@@ -182,12 +182,12 @@ export class Platform {
     ) {
       vec3.normalize(
         offsetComparedToHitObject,
-        vec3.set(diff, 0.0, diff[1], 0.0)
+        vec3.set(diff, 0.0, diff[1], 0.0),
       );
     } else {
       vec3.normalize(
         offsetComparedToHitObject,
-        vec3.set(diff, 0.0, 0.0, diff[2])
+        vec3.set(diff, 0.0, 0.0, diff[2]),
       );
     }
 
@@ -198,9 +198,9 @@ export class Platform {
           this.baseBlock.physicsObject.physicsObjectId
           ? vec3.create()
           : hit.object.transform.position,
-        offsetComparedToHitObject
+        offsetComparedToHitObject,
       ),
-      type
+      type,
     );
   }
 
@@ -211,7 +211,7 @@ export class Platform {
       ray,
       true,
       [player.physicsObject],
-      100.0
+      100.0,
     );
     if (hit.object == undefined) {
       return;
@@ -224,7 +224,7 @@ export class Platform {
     }
 
     this.removeBlock(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
     );
   }
 
@@ -237,7 +237,7 @@ export class Platform {
       return;
     }
     this.physicsObjectIdToAttachedBlocksKey.delete(
-      block.physicsObject.physicsObjectId
+      block.physicsObject.physicsObjectId,
     );
     this.physicsScene.removePhysicsObject(block.physicsObject);
     this.scene.deleteGraphicsBundle(block.graphicsBundle);
