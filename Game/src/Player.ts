@@ -1,7 +1,7 @@
 import { vec2, vec3, quat, mat4 } from "gl-matrix";
-import { Camera, PhysicsObject, PhysicsScene } from "praccen-web-engine";
+import { Camera, PhysicsObject, PhysicsScene, Ray } from "praccen-web-engine";
 import { Input } from "./Input";
-import { BlockType, Platform } from "./Platform";
+import { Block, BlockType, Platform } from "./Platform";
 
 const acceleration: number = 20.0;
 const jumpForce: number = 1.5;
@@ -62,30 +62,7 @@ export default class Player {
 
     // vec3.scaleAndAdd(this.physicsObject.force, this.physicsObject.force, camera.getDir(), acceleration);
 
-    // if (Input.mouseClicked || Input.mouseRightClicked) {
-    //     if (!this.mouseWasClicked) {
-    //         vec3.scaleAndAdd(this.physicsObject.impulse, this.physicsObject.impulse, vec3.fromValues(0.0, 1.0, 0.0), jumpForce);
-    //     }
-    //     this.mouseWasClicked = true;
-    // }
-    // else {
-    //     this.mouseWasClicked = false;
-    // }
-
-    // Jump off platform
-    if (Input.keys[" "] && this.connectedBlock != null) {
-      this.setConnectedBlock(null);
-      vec3.scaleAndAdd(
-        this.physicsObject.impulse,
-        this.physicsObject.impulse,
-        vec3.transformQuat(
-          vec3.create(),
-          vec3.fromValues(0.0, 1.0, 0.0),
-          this.physicsObject.transform.rotation
-        ),
-        jumpForce
-      );
-    }
+    this.handleInput(camera, platform);
 
     // Set position from connected block
     if (this.connectedBlock != null) {
@@ -101,6 +78,10 @@ export default class Player {
       );
     }
 
+    this.updateCamera(camera);
+  }
+
+  updateCamera(camera: Camera) {
     let camOffset = vec3.fromValues(0.0, 1.8, 0.0);
     vec3.transformQuat(
       camOffset,
@@ -120,14 +101,38 @@ export default class Player {
     let up = vec3.fromValues(0.0, 1.0, 0.0);
     vec3.transformQuat(up, up, this.physicsObject.transform.rotation);
     camera.setUp(up);
+  }
+
+  handleInput(camera: Camera, platform: Platform) {
+    // Move to block ad point
+    if (Input.keys["E"]) {
+      let ray = new Ray();
+      ray.setDir(vec3.clone(camera.getDir()));
+      ray.setStart(vec3.clone(camera.getPosition()));
+    }
+
+    // Jump off platform
+    if (Input.keys[" "] && this.connectedBlock != null) {
+      this.setConnectedBlock(null);
+      vec3.scaleAndAdd(
+        this.physicsObject.impulse,
+        this.physicsObject.impulse,
+        vec3.transformQuat(
+          vec3.create(),
+          vec3.fromValues(0.0, 1.0, 0.0),
+          this.physicsObject.transform.rotation
+        ),
+        jumpForce
+      );
+    }
+
     if (Input.mouseClicked) {
       if (!this.mouseWasClicked) {
         platform.placeBlockFromRayCast(BlockType.FLOOR, camera, this);
       }
 
       this.mouseWasClicked = true;
-    }
-    else {
+    } else {
       this.mouseWasClicked = false;
     }
 
@@ -137,8 +142,7 @@ export default class Player {
       }
 
       this.mouseRightWasClicked = true;
-    }
-    else {
+    } else {
       this.mouseRightWasClicked = false;
     }
   }
