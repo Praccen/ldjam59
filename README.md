@@ -1,1 +1,36 @@
 # ldjam59
+
+### Setup
+
+```
+npm run setup
+```
+
+Will install all needed packages
+
+### Compile
+
+```
+npm run build
+```
+
+or for watch build of game files which will auto rebuild as soon as a file is saved.
+
+```
+npm run dev 
+```
+
+There are tasks setup for this if you are using vscode (located in the .vscode folder)
+
+### Formatting
+
+```
+npm run format
+```
+
+### Running
+
+```
+1. Setup a server that hosts the root of this repo
+2. Goto the [server address]/Game in a browser
+```
