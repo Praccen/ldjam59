@@ -207,6 +207,17 @@ export default class Game {
         this.physicsScene.removePhysicsObject(block.physicsObject);
         return false;
       }
+      if (
+        this.player.physicsObject.collisionsLastUpdate.has(
+          block.physicsObject.physicsObjectId
+        )
+      ) {
+        // Todo: Add this block to the player inventory
+        this.scene.deleteGraphicsBundle(block.graphicsBundle);
+        this.physicsScene.removePhysicsObject(block.physicsObject);
+        console.log("Picked up block of type: " + block.type);
+        return false;
+      }
       return true;
     });
   }
