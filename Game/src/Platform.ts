@@ -15,18 +15,27 @@ export enum BlockType {
   BASE,
   FLOOR,
   SOLARPANEL,
+  ANTENNA1,
+  ANTENNA2,
+  ANTENNA3,
 }
 
 const BlockTypeToColorMap = new Map<BlockType, string>([
   [BlockType.BASE, "Assets/Textures/palette.png"],
   [BlockType.FLOOR, "Assets/Textures/palette.png"],
   [BlockType.SOLARPANEL, "Assets/Textures/palette.png"],
+  [BlockType.ANTENNA1, "Assets/Textures/palette.png"],
+  [BlockType.ANTENNA2, "Assets/Textures/palette.png"],
+  [BlockType.ANTENNA3, "Assets/Textures/palette.png"],
 ]);
 
 const BlockTypeToMeshMap = new Map<BlockType, string>([
   [BlockType.BASE, "Assets/objs/spacebox.obj"],
   [BlockType.FLOOR, "Assets/objs/spacefloor.obj"],
   [BlockType.SOLARPANEL, "Assets/objs/spacesolar.obj"],
+  [BlockType.ANTENNA1, "Assets/objs/spaceantenna1.obj"],
+  [BlockType.ANTENNA2, "Assets/objs/spaceantenna2.obj"],
+  [BlockType.ANTENNA3, "Assets/objs/spaceantenna3.obj"],
 ]);
 
 export class Block {
@@ -82,13 +91,76 @@ export class Platform {
     this.physicsScene = physicsScene;
 
     this.addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE).then(() => {
-      this.addBlock(vec3.fromValues(1, 0, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(0, 0, 1), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(0, 0, -1), BlockType.SOLARPANEL);
-      if (player) {
-        player.setConnectedBlock(this.baseBlock, false);
-      }
+      this.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 3, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 4, 0), BlockType.BASE);
+
+      this.addBlock(vec3.fromValues(1, 4, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(2, 4, 0), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(-1, 4, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(-2, 4, 0), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(0, 4, 1), BlockType.SOLARPANEL).then(
+        (block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
+        }
+      );
+      this.addBlock(vec3.fromValues(0, 4, 2), BlockType.SOLARPANEL).then(
+        (block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
+        }
+      );
+
+      this.addBlock(vec3.fromValues(0, 4, -1), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(0, 4, -2), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(0, 5, 0), BlockType.ANTENNA1);
+      this.addBlock(vec3.fromValues(0, 6, 0), BlockType.ANTENNA2);
+      this.addBlock(vec3.fromValues(0, 7, 0), BlockType.ANTENNA3);
+
+      this.addBlock(vec3.fromValues(-1, 0, -1), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 0, -1), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(1, 0, -1), BlockType.FLOOR);
+
+      this.addBlock(vec3.fromValues(1, 0, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.FLOOR);
+
+      this.addBlock(vec3.fromValues(2, 0, 0), BlockType.ANTENNA3).then(
+        (block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 90, 90, 0);
+        }
+      );
+
+      this.addBlock(vec3.fromValues(-1, 0, 1), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 0, 1), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(1, 0, 1), BlockType.FLOOR);
+
+      this.addBlock(vec3.fromValues(0, 0, 2), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, 0, 3), BlockType.BASE);
+      this.addBlock(vec3.fromValues(1, 0, 3), BlockType.FLOOR).then((block) => {
+        if (player) {
+          player.setConnectedBlock(block, false);
+        }
+      });
+
+      this.addBlock(vec3.fromValues(0, -1, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, -2, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, -3, 0), BlockType.FLOOR);
+      this.addBlock(vec3.fromValues(0, -4, 0), BlockType.BASE);
+
+      this.addBlock(vec3.fromValues(1, -4, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(2, -4, 0), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(-1, -4, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(-2, -4, 0), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(0, -4, 1), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(0, -4, 2), BlockType.SOLARPANEL);
+
+      this.addBlock(vec3.fromValues(0, -4, -1), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(0, -4, -2), BlockType.SOLARPANEL);
     });
   }
 
@@ -148,6 +220,9 @@ export class Platform {
           "CSS:rgb(0,0,0)"
         )
         .then((gb) => {
+          gb.emission = this.scene.renderer.textureStore.getTexture(
+            "Assets/Textures/emissionpalette.png"
+          );
           gb.transform.position = offset;
           if (this.baseBlock != undefined) {
             gb.transform.parentTransform =
