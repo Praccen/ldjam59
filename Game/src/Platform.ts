@@ -532,20 +532,24 @@ export class Platform {
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     )!.type;
 
-    this.removeBlock(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
-    );
+    if (
+      this.removeBlock(
+        this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+      )
+    ) {
+      return type;
+    }
 
-    return type;
+    return null;
   }
 
-  removeBlock(key: string) {
+  removeBlock(key: string): boolean {
     if (!this.attachedBlocks.has(key)) {
-      return;
+      return false;
     }
     let block = this.attachedBlocks.get(key)!;
     if (block === this.baseBlock) {
-      return;
+      return false;
     }
     this.physicsObjectIdToAttachedBlocksKey.delete(
       block.physicsObject.physicsObjectId
@@ -583,6 +587,8 @@ export class Platform {
       const offset = vec3.fromValues(x, y, z);
       this.addBlock(offset, BlockType.EMPTY);
     }
+
+    return true;
   }
 
   getNeighborBlocks(block: Block): Block[] {
