@@ -70,6 +70,7 @@ export default class Game {
 
   createLevel() {
     this.scene = new Scene(this.renderer);
+    this.scene.useTrees = false;
 
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
