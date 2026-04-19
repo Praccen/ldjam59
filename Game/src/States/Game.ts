@@ -17,6 +17,7 @@ import { gameContext } from "../main.js";
 import Player from "../Player.js";
 import {
   Block,
+  BlockType,
   createDebrisShip,
   createStartingShip,
   Platform,
@@ -128,8 +129,8 @@ export default class Game {
       this.player
     );
 
-    // this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    // createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+    this.debrisPlatform = new Platform(this.scene, this.physicsScene);
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
   }
 
   resize(width: number, height: number) {
@@ -195,7 +196,10 @@ export default class Game {
             this.player.connectedBlock != null ||
             this.player.tetheredBlock != null
           ) {
-            this.startingPlatform.resetWithNewBaseBlock(this.player);
+            this.startingPlatform.resetWithNewBaseBlock(
+              this.player,
+              this.detachedBlocks
+            );
           }
         }
       }

@@ -244,13 +244,22 @@ export class Platform {
     this.physicsScene = physicsScene;
   }
 
-  resetWithNewBaseBlock(player: Player) {
+  resetWithNewBaseBlock(player: Player, detachedBlocks: Block[]) {
     this.attachedBlocks.clear();
     this.physicsObjectIdToAttachedBlocksKey.clear();
-    let activeBlock =
-      player.connectedBlock != null
-        ? player.connectedBlock
-        : player.tetheredBlock;
+    let closest = Infinity;
+    let activeBlock = detachedBlocks[0];
+    for (const block of detachedBlocks) {
+      const sqrDist = vec3.sqrDist(
+        block.getWorldPos(),
+        player.physicsObject.transform.position
+      );
+      if (sqrDist < closest) {
+        closest = sqrDist;
+        activeBlock = block;
+      }
+    }
+
     this.baseBlock = activeBlock;
     player.setTetheredBlock(this.baseBlock);
     this.baseBlock.physicsObject.isImmovable = true;
@@ -263,6 +272,14 @@ export class Platform {
       activeBlock.physicsObject.physicsObjectId,
       vec3.create().toString()
     );
+
+    // Add empty blocks around this block
+    this.addBlock(vec3.fromValues(1, 0, 0), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(0, 1, 0), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(0, -1, 0), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(0, 0, 1), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(0, 0, -1), BlockType.EMPTY);
   }
 
   getBlockFromPhysicsObject(physicsObject: PhysicsObject): Block | undefined {
@@ -569,6 +586,13 @@ export class Platform {
       if (block[1] == undefined) {
         continue;
       }
+
+      if (block[1].type == BlockType.EMPTY) {
+        this.physicsScene.removePhysicsObject(block[1].physicsObject);
+        this.scene.deleteGraphicsBundle(block[1].graphicsBundle);
+        continue;
+      }
+
       block[1]!.graphicsBundle.transform.position = vec3.transformMat4(
         vec3.create(),
         vec3.create(),
