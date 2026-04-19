@@ -428,14 +428,20 @@ export class Platform {
 
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
-    let hit = this.physicsScene.doRayCast(
-      ray,
-      false,
-      [player.physicsObject, player.connectedBlock.physicsObject].concat(
-        filtered
-      ),
-      2.0
+
+    let ignoredObjects = [
+      player.physicsObject,
+      player.tetheredBlock.physicsObject,
+    ].concat(filtered);
+
+    // Find out if tethered block only has one real neighbor, if so do not remove it
+    const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
+      (block) => block.type != BlockType.EMPTY
     );
+    if (neighbors.length == 1) {
+      ignoredObjects.push(neighbors.at(0).physicsObject);
+    }
+    let hit = this.physicsScene.doRayCast(ray, false, ignoredObjects, 2.0);
     if (hit.object == undefined) {
       return null;
     }
@@ -493,12 +499,20 @@ export class Platform {
 
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
-    let hit = this.physicsScene.doRayCast(
-      ray,
-      true,
-      [player.physicsObject].concat(filtered),
-      100.0
+
+    let ignoredObjects = [
+      player.physicsObject,
+      player.tetheredBlock.physicsObject,
+    ].concat(filtered);
+
+    // Find out if tethered block only has one real neighbor, if so do not remove it
+    const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
+      (block) => block.type != BlockType.EMPTY
     );
+    if (neighbors.length == 1) {
+      ignoredObjects.push(neighbors.at(0).physicsObject);
+    }
+    let hit = this.physicsScene.doRayCast(ray, false, ignoredObjects, 2.0);
     if (hit.object == undefined) {
       return null;
     }
