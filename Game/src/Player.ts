@@ -217,25 +217,28 @@ export default class Player {
 
     if (Input.mouseClicked) {
       if (!this.mouseWasClicked) {
-        platform.placeBlockFromRayCast(BlockType.FLOOR, camera, this);
+        if (Input.keys["SHIFT"]) {
+          let type = platform.removeBlockFromRayCast(camera, this);
+          if (type != undefined) {
+            this.pickupBlock(type!);
+          }
+        } else {
+          platform.placeBlockFromRayCast(BlockType.FLOOR, camera, this);
+        }
       }
-
       this.mouseWasClicked = true;
     } else {
       this.mouseWasClicked = false;
     }
 
     if (Input.mouseRightClicked && this.connectedBlock != null) {
-      // if (!this.mouseRightWasClicked) {
       platform.showEmptyBlock(camera, this);
-      // let type = platform.removeBlockFromRayCast(camera, this);
-      // if (type != undefined) {
-      // this.pickupBlock(type!);
-      // }
+      if (!this.mouseRightWasClicked) {
+      }
+      this.mouseRightWasClicked = true;
+    } else {
+      this.mouseRightWasClicked = false;
     }
-    // this.mouseRightWasClicked = true;
-    // } else {
-    // this.mouseRightWasClicked = false;
   }
 
   pickupBlock(blockType: BlockType) {

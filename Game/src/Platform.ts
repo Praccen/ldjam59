@@ -218,6 +218,14 @@ export class Block {
 export class Platform {
   private scene: Scene;
   private physicsScene: PhysicsScene;
+  private static readonly NEIGHBOR_OFFSETS: vec3[] = [
+    vec3.fromValues(1, 0, 0),
+    vec3.fromValues(-1, 0, 0),
+    vec3.fromValues(0, 1, 0),
+    vec3.fromValues(0, -1, 0),
+    vec3.fromValues(0, 0, 1),
+    vec3.fromValues(0, 0, -1),
+  ];
 
   baseBlock: Block;
   private attachedBlocks: Map<string, Block | undefined> = new Map<
@@ -272,18 +280,18 @@ export class Platform {
   }
 
   addBlock(offset: vec3, type: BlockType): Promise<Block> {
-    return new Promise<Block>(async (resolve, reject) => {
-      if (this.attachedBlocks.has(offset.toString())) {
-        if (
-          type != BlockType.EMPTY &&
-          this.attachedBlocks.get(offset.toString()).type == BlockType.EMPTY
-        ) {
-          this.removeBlock(offset.toString());
-        } else {
-          reject("Grid spot taken");
-        }
+    if (this.attachedBlocks.has(offset.toString())) {
+      if (
+        type != BlockType.EMPTY &&
+        this.attachedBlocks.get(offset.toString()).type == BlockType.EMPTY
+      ) {
+        this.removeBlock(offset.toString());
+      } else {
+        return null;
       }
+    }
 
+    return new Promise<Block>(async (resolve, reject) => {
       if (type != BlockType.EMPTY) {
         if (this.baseBlock == undefined) {
           type = BlockType.BASE;
@@ -434,7 +442,8 @@ export class Platform {
   }
 
   showEmptyBlock(camera: Camera, player: Player) {
-    const filterd = [...this.attachedBlocks.values()]
+    // Ignore none empty blocks
+    const filtered = [...this.attachedBlocks.values()]
       .filter((block) => block.type != BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
@@ -444,9 +453,9 @@ export class Platform {
       ray,
       true,
       [player.physicsObject, player.connectedBlock.physicsObject].concat(
-        filterd
+        filtered
       ),
-      100.0
+      2.0
     );
     if (hit.object == undefined) {
       return null;
@@ -459,16 +468,21 @@ export class Platform {
     // TODO do this in a better way
     setTimeout(() => {
       hitEmptyBlock.graphicsBundle.enabled = false;
-    }, 1000);
+    }, 500);
   }
 
   removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {
+    // Ignore empty blocks
+    const filtered = [...this.attachedBlocks.values()]
+      .filter((block) => block.type == BlockType.EMPTY)
+      .map((block) => block.physicsObject);
+
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
     let hit = this.physicsScene.doRayCast(
       ray,
       true,
-      [player.physicsObject],
+      [player.physicsObject].concat(filtered),
       100.0
     );
     if (hit.object == undefined) {
@@ -506,6 +520,51 @@ export class Platform {
     this.physicsScene.removePhysicsObject(block.physicsObject);
     this.scene.deleteGraphicsBundle(block.graphicsBundle);
     this.attachedBlocks.delete(key);
+
+    // Clean up orphaned empty blocks around the removed position
+    if (block.type !== BlockType.EMPTY) {
+      for (const neighbor of this.getNeighborBlocks(block)) {
+        if (neighbor.type !== BlockType.EMPTY) {
+          continue;
+        }
+        const neighborBlock = this.attachedBlocks.get(
+          this.physicsObjectIdToAttachedBlocksKey.get(
+            neighbor.physicsObject.physicsObjectId
+          )
+        );
+        const hasRealNeighbor = this.getNeighborBlocks(neighborBlock).some(
+          (block) => block.type !== BlockType.EMPTY
+        );
+        if (!hasRealNeighbor) {
+          this.removeBlock(
+            this.physicsObjectIdToAttachedBlocksKey.get(
+              neighbor.physicsObject.physicsObjectId
+            )
+          );
+        }
+      }
+    }
+
+    if (block.type !== BlockType.EMPTY) {
+      const [x, y, z] = key.split(",").map(Number);
+      const offset = vec3.fromValues(x, y, z);
+      this.addBlock(offset, BlockType.EMPTY);
+    }
+  }
+
+  getNeighborBlocks(block: Block): Block[] {
+    const neighbors: Block[] = [];
+    const neighborPos = vec3.create();
+
+    for (const offset of Platform.NEIGHBOR_OFFSETS) {
+      vec3.add(neighborPos, block.graphicsBundle.transform.position, offset);
+      const neighbor = this.attachedBlocks.get(neighborPos.toString());
+      if (neighbor) {
+        neighbors.push(neighbor);
+      }
+    }
+
+    return neighbors;
   }
 
   splitPlatform(detachedBlocks: Block[], pieceMass: number = 1.0) {
