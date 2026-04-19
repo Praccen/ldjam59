@@ -101,15 +101,14 @@ export function createStartingShip(
       platform.addBlock(vec3.fromValues(0, 0, 2), BlockType.FLOOR);
       platform.addBlock(vec3.fromValues(0, 0, 3), BlockType.FLOOR);
       platform
-        .addBlock(vec3.fromValues(1, 0, 3), BlockType.BASE)
+        .addBlock(vec3.fromValues(1, 1, 3), BlockType.EMPTY)
         .then((block) => {
           if (player) {
-            // player.setConnectedBlock(
-            //   this.attachedBlocks.get(vec3.fromValues(1, 1, 3).toString()),
-            //   false
-            // );
+            player.setConnectedBlock(block, false);
           }
         });
+
+      platform.addBlock(vec3.fromValues(1, 0, 3), BlockType.BASE);
 
       platform.addBlock(vec3.fromValues(0, -1, 0), BlockType.FLOOR);
       platform.addBlock(vec3.fromValues(0, -2, 0), BlockType.FLOOR);
@@ -231,7 +230,10 @@ export class Platform {
   ];
 
   baseBlock: Block;
-  attachedBlocks: Map<string, Block | undefined> = new Map<string, Block>();
+  private attachedBlocks: Map<string, Block | undefined> = new Map<
+    string,
+    Block
+  >();
   private physicsObjectIdToAttachedBlocksKey: Map<number, string> = new Map<
     number,
     string
