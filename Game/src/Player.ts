@@ -142,7 +142,7 @@ export default class Player {
   }
 
   updateCamera(camera: Camera) {
-    let camOffset = vec3.fromValues(0.0, 0.0, 0.0);
+    let camOffset = vec3.fromValues(0.0, 0.25, 0.0);
     vec3.transformQuat(
       camOffset,
       camOffset,
