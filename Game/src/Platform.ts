@@ -18,9 +18,9 @@ export enum BlockType {
 }
 
 const BlockTypeToColorMap = new Map<BlockType, string>([
-  [BlockType.BASE, "Assets/textures/palette.png"],
-  [BlockType.FLOOR, "Assets/textures/palette.png"],
-  [BlockType.SOLARPANEL, "Assets/textures/palette.png"],
+  [BlockType.BASE, "Assets/Textures/palette.png"],
+  [BlockType.FLOOR, "Assets/Textures/palette.png"],
+  [BlockType.SOLARPANEL, "Assets/Textures/palette.png"],
 ]);
 
 const BlockTypeToMeshMap = new Map<BlockType, string>([
@@ -47,13 +47,13 @@ export class Block {
     return vec3.transformMat4(
       vec3.create(),
       vec3.create(),
-      this.graphicsBundle.transform.matrix,
+      this.graphicsBundle.transform.matrix
     );
   }
   getWorldRot(): quat {
     return mat4.getRotation(
       quat.create(),
-      this.graphicsBundle.transform.matrix,
+      this.graphicsBundle.transform.matrix
     );
   }
 }

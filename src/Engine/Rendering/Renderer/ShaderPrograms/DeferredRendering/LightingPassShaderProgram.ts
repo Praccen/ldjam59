@@ -134,8 +134,8 @@ function getFragSrc() {
 	float currentDepth = projCoords.z;
 	
 	// check whether current frag pos is in shadow
-	float bias = -max(0.001 * (1.0 - dot(normal, directionalLight.direction)), 0.002);
-	// float bias = 0.0;
+	// float bias = max(0.001 * (1.0 - dot(normal, directionalLight.direction)), 0.002);
+	float bias = 0.0;
 	
 	float shadow = 0.0;
 	ivec2 textureSize = textureSize(depthMap, 0);
