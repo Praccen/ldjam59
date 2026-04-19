@@ -299,6 +299,7 @@ export class Platform {
             gb.transform
           );
           physicsObject.setupInternalTreeFromGraphicsObject(gb.graphicsObject);
+          physicsObject.collisionCoefficient = 0.2;
 
           let block = new Block(gb, physicsObject, type);
           if (vec3.sqrLen(offset) < 0.0001) {
@@ -448,7 +449,6 @@ export class Platform {
 
       block[1]!.physicsObject.isImmovable = false;
       block[1]!.physicsObject.mass = pieceMass;
-      block[1]!.physicsObject.collisionCoefficient = 0.2;
       block[1]!.physicsObject.internalTree = null!;
 
       vec3.set(
