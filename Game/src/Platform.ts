@@ -281,6 +281,7 @@ export class Platform {
 
   addBlock(offset: vec3, type: BlockType): Promise<Block> {
     if (this.attachedBlocks.has(offset.toString())) {
+      // Replace if empty block
       if (
         type != BlockType.EMPTY &&
         this.attachedBlocks.get(offset.toString()).type == BlockType.EMPTY
@@ -367,12 +368,18 @@ export class Platform {
   }
 
   placeBlockFromRayCast(type: BlockType, camera: Camera, player: Player) {
+    const filtered = [...this.attachedBlocks.values()]
+      .filter((block) => block.type != BlockType.EMPTY)
+      .map((block) => block.physicsObject);
+
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
     let hit = this.physicsScene.doRayCast(
       ray,
       true,
-      [player.physicsObject],
+      [player.physicsObject, player.connectedBlock.physicsObject].concat(
+        filtered
+      ),
       100.0
     );
     if (hit.object == undefined) {
@@ -385,60 +392,12 @@ export class Platform {
       return;
     }
 
-    let hitPosition = vec3.scaleAndAdd(
-      vec3.create(),
-      camera.getPosition(),
-      camera.getDir(),
-      hit.distance
+    const key = this.physicsObjectIdToAttachedBlocksKey.get(
+      hit.object.physicsObjectId
     );
-    let hitPositionInLocalCoords = vec3.transformMat4(
-      vec3.create(),
-      hitPosition,
-      mat4.invert(mat4.create(), this.baseBlock.physicsObject.transform.matrix)
-    );
-
-    let diff = vec3.sub(
-      vec3.create(),
-      hitPositionInLocalCoords,
-      hit.object.physicsObjectId == this.baseBlock.physicsObject.physicsObjectId
-        ? vec3.create()
-        : hit.object.transform.position
-    );
-    let offsetComparedToHitObject = vec3.create();
-    if (
-      Math.abs(diff[0]) > Math.abs(diff[1]) &&
-      Math.abs(diff[0]) > Math.abs(diff[2])
-    ) {
-      vec3.normalize(
-        offsetComparedToHitObject,
-        vec3.set(diff, diff[0], 0.0, 0.0)
-      );
-    } else if (
-      Math.abs(diff[1]) > Math.abs(diff[0]) &&
-      Math.abs(diff[1]) > Math.abs(diff[2])
-    ) {
-      vec3.normalize(
-        offsetComparedToHitObject,
-        vec3.set(diff, 0.0, diff[1], 0.0)
-      );
-    } else {
-      vec3.normalize(
-        offsetComparedToHitObject,
-        vec3.set(diff, 0.0, 0.0, diff[2])
-      );
-    }
-
-    this.addBlock(
-      vec3.add(
-        vec3.create(),
-        hit.object.physicsObjectId ==
-          this.baseBlock.physicsObject.physicsObjectId
-          ? vec3.create()
-          : hit.object.transform.position,
-        offsetComparedToHitObject
-      ),
-      type
-    );
+    const [x, y, z] = key.split(",").map(Number);
+    const offset = vec3.fromValues(x, y, z);
+    this.addBlock(offset, type);
   }
 
   showEmptyBlock(camera: Camera, player: Player) {
