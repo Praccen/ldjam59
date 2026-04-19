@@ -9,6 +9,7 @@ import {
 import { Input } from "./Input";
 import { Block, BlockType, Platform } from "./Platform";
 import GameGUI from "./GUI/GameGUI";
+import ActionBar from "./GUI/Inventory";
 
 const jumpForce: number = 1.5;
 const sensitivity: number = 0.4;
@@ -35,7 +36,7 @@ export default class Player {
   private picking: boolean = false;
   private jumping: boolean = false;
 
-  private inventory: Map<BlockType, number> = new Map<BlockType, number>();
+  private inventory: ActionBar;
 
   constructor(
     physicsScene: PhysicsScene,
@@ -50,6 +51,8 @@ export default class Player {
     vec3.set(this.physicsObject.transform.origin, 0.0, -0.5, 0.0);
     vec3.set(this.physicsObject.transform.position, 0.0, 1.0, 0.0);
     this.physicsObject.drag = 0.0;
+
+    this.inventory = new ActionBar(this.guiRenderer, this.gameGUI);
   }
 
   setTetheredBlock(block: Block) {
@@ -85,6 +88,8 @@ export default class Player {
     this.setPositionFromBlock(dt);
 
     this.updateCamera(camera);
+
+    this.inventory.update();
   }
 
   setPositionFromBlock(dt: number) {
@@ -228,7 +233,12 @@ export default class Player {
             this.pickupBlock(type!);
           }
         } else {
-          platform.placeBlockFromRayCast(BlockType.FLOOR, camera, this);
+          let type = this.inventory.useSelected();
+          if (type != undefined) {
+            if (!platform.placeBlockFromRayCast(type, camera, this)) {
+              this.inventory.addItem(type); // Couldn't place block, give it back to inventory
+            }
+          }
         }
       }
       this.mouseWasClicked = true;
@@ -247,17 +257,6 @@ export default class Player {
   }
 
   pickupBlock(blockType: BlockType) {
-    let inventoryAmount = this.inventory.get(blockType);
-    if (inventoryAmount == undefined) {
-      inventoryAmount = 0;
-      // this.guiRenderer.getNew2DText(this.gameGUI.inventoryDiv);
-    }
-    this.inventory.set(blockType, inventoryAmount + 1);
-    console.log(
-      "BlockType:" +
-        BlockType[blockType] +
-        " : " +
-        (inventoryAmount + 1).toString()
-    );
+    this.inventory.addItem(blockType);
   }
 }

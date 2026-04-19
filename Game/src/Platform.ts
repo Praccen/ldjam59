@@ -387,7 +387,11 @@ export class Platform {
     });
   }
 
-  placeBlockFromRayCast(type: BlockType, camera: Camera, player: Player) {
+  placeBlockFromRayCast(
+    type: BlockType,
+    camera: Camera,
+    player: Player
+  ): boolean {
     const filtered = [...this.attachedBlocks.values()]
       .filter((block) => block.type != BlockType.EMPTY)
       .map((block) => block.physicsObject);
@@ -403,13 +407,13 @@ export class Platform {
       100.0
     );
     if (hit.object == undefined) {
-      return;
+      return false;
     }
 
     if (
       !this.physicsObjectIdToAttachedBlocksKey.has(hit.object.physicsObjectId)
     ) {
-      return;
+      return false;
     }
 
     const key = this.physicsObjectIdToAttachedBlocksKey.get(
@@ -418,6 +422,7 @@ export class Platform {
     const [x, y, z] = key.split(",").map(Number);
     const offset = vec3.fromValues(x, y, z);
     this.addBlock(offset, type);
+    return true;
   }
 
   showRemovableBlock(camera: Camera, player: Player) {
