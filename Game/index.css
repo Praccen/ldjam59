@@ -1,160 +1,581 @@
-* {font-family:'Courier New', Courier, monospace;}
-			
-body { margin: 0; overflow: hidden; position: absolute}
-			
-canvas {position: absolute; }
+* {
+  font-family: "Courier New", Courier, monospace;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+canvas {
+  position: absolute;
+}
 
 .inventoryCanvas {
-	position: relative;
-	padding: 0;
-	margin: auto;
-	display: block;
-	/* background-color: #8d8d8d; */
+  position: relative;
+  padding: 0;
+  margin: auto;
+  display: block;
+  /* background-color: #8d8d8d; */
 }
 
 .itemLabel {
-	background-color: rgba(0, 0, 0, 0.1);
-	padding: 0.25em;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.25em;
 }
-			
-.guiContainer {position: relative;}
+
+.guiContainer {
+  position: relative;
+}
 
 .button {
-	font-size: inherit;
-	font-family: inherit;
-	background: linear-gradient(#d34c62, #d34c62, #93205d);
-	color: #ffffff;
-	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
-	border: 2px solid black;
-	border-radius: 5px;
-	font-weight: bold;
-	box-shadow: inset 0 0.7em 0 rgba(255,255,255, .2);
-	padding: 5px 20px;
-	transition: all 0.1s;
-	cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  background: linear-gradient(#d34c62, #d34c62, #93205d);
+  color: #ffffff;
+  text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+  border: 2px solid black;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: inset 0 0.7em 0 rgba(255, 255, 255, 0.2);
+  padding: 5px 20px;
+  transition: all 0.1s;
+  cursor: pointer;
 }
-  
+
 .button:hover {
-	box-shadow: 
-	  inset 0 0.7em 0 rgba(255,255,255, .2),
-	  inset 0 0 0.5em rgba(0,0,255, .2);
+  box-shadow: inset 0 0.7em 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0.5em rgba(0, 0, 255, 0.2);
 }
-  
+
 .button:active {
-	box-shadow: 
-	  inset 0 0.1em 0 rgba(255,255,255, .2),
-	  inset 0 0 0.5em rgba(0,0,255, .2);
+  box-shadow: inset 0 0.1em 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0.5em rgba(0, 0, 255, 0.2);
 }
 
 .listButton {
-	position: relative;
-	font-size: inherit;
-	font-family: inherit;
-	background-color: transparent;
-	color: white;
-	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-	width: 100%;
-	text-align: left;
+  position: relative;
+  font-size: inherit;
+  font-family: inherit;
+  background-color: transparent;
+  color: white;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  width: 100%;
+  text-align: left;
 }
 
 .checkboxContainer {
-	display: block;
-	position: relative;
-	margin-bottom: 12px;
-	cursor: pointer;
-	font-size: inherit;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	color: cyan;
+  display: block;
+  position: relative;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: inherit;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: cyan;
 }
 
 .checkboxContainer input {
-	position: absolute;
-	opacity: 0;
-	cursor: pointer;
-	height: 0;
-	width: 0;
-  }
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
 
 .checkmark {
-	position: absolute;
-	top: 0.05em;
-	line-height: 0.7em;
-	width: 1.5em;
-	background-color: transparent;
-	border: 0.1em solid cyan;
-	border-radius: 10%;
-	box-shadow: inset 0 0 0 cyan;
-	transition: all 0.2s;
-	vertical-align: middle;
+  position: absolute;
+  top: 0.05em;
+  line-height: 0.7em;
+  width: 1.5em;
+  background-color: transparent;
+  border: 0.1em solid cyan;
+  border-radius: 10%;
+  box-shadow: inset 0 0 0 cyan;
+  transition: all 0.2s;
+  vertical-align: middle;
 }
 
 .checkmark:before {
-	position: relative;
-	left: 0.1em;
-	content: "OFF";
-	font-size: 0.6em;
-	color: cyan;
+  position: relative;
+  left: 0.1em;
+  content: "OFF";
+  font-size: 0.6em;
+  color: cyan;
 }
 
 .checkboxContainer:hover input ~ .checkmark {
-	background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .checkboxContainer:hover input:checked ~ .checkmark {
-	box-shadow: inset 1.6em 0 0 rgba(0, 255, 255, 0.8);
+  box-shadow: inset 1.6em 0 0 rgba(0, 255, 255, 0.8);
 }
 
 .checkboxContainer input:checked ~ .checkmark {
-	box-shadow: inset 1.6em 0 0 cyan;
+  box-shadow: inset 1.6em 0 0 cyan;
 }
 
 .checkboxContainer input:checked ~ .checkmark:before {
-	position: relative;
-    content: "ON";
-    color: black;
-    left: 1.2em;
-	font-size: 0.6em;
+  position: relative;
+  content: "ON";
+  color: black;
+  left: 1.2em;
+  font-size: 0.6em;
 }
 
 .slider {
-	-webkit-appearance: none;
-	font-size: inherit;
-	height: 0.5em;
-	width: 10.0em;
-	border-radius: 10%;  
-	background: rgba(0, 255, 255, 0.2);
-	outline: none;
-	-webkit-transition: all .2s;
-	transition: all .2s;
-  }
+  -webkit-appearance: none;
+  font-size: inherit;
+  height: 0.5em;
+  width: 10em;
+  border-radius: 10%;
+  background: rgba(0, 255, 255, 0.2);
+  outline: none;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
 
-  .slider:hover {
-	background: rgba(0, 255, 255, 0.4);
-  }
-  
-  .slider::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 1.0em;
-	height: 1.0em;
-	border-radius: 50%; 
-	background: cyan;
-	cursor: pointer;
-  }
-  
-  .slider::-moz-range-thumb {
-	width: 1.0em;
-	height: 1.0em;
-	border-radius: 50%;
-	background: cyan;
-	cursor: pointer;
-  }
+.slider:hover {
+  background: rgba(0, 255, 255, 0.4);
+}
 
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: cyan;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: cyan;
+  cursor: pointer;
+}
 
 .sliderLabel {
-	font-size: inherit;
-	color: cyan;
+  font-size: inherit;
+  color: cyan;
+}
+
+/* ── Main Menu ── */
+
+.main-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #08060a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 1s ease, visibility 1s;
+}
+
+.main-menu.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Skybox background ── */
+
+.menu-skybox {
+  position: absolute;
+  inset: -20px;
+  background-image: url("Assets/Skybox/front.png");
+  background-size: cover;
+  background-position: center;
+  animation: skyboxDrift 60s linear infinite alternate;
+}
+
+@keyframes skyboxDrift {
+  from {
+    transform: translate(0, 0) scale(1.05);
+  }
+  to {
+    transform: translate(-15px, 10px) scale(1.1);
+  }
+}
+
+/* ── Mars planet ── */
+
+.mars-planet {
+  position: absolute;
+  bottom: -35vmax;
+  right: -5vmax;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  overflow: hidden;
+  animation: marsFloat 20s ease-in-out infinite;
+}
+
+/* Wrapper for surface content */
+.mars-spin-group {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* Surface: uses the actual Mars texture, scrolling horizontally to simulate rotation */
+.mars-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: url("Assets/Textures/2k_mars.jpg");
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
+  animation: marsScroll 120s linear infinite;
+}
+
+@keyframes marsScroll {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+/* Atmosphere — limb glow (doesn't spin) */
+.mars-atmosphere {
+  position: absolute;
+  inset: -3%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 45%,
+    transparent 44%,
+    rgba(220, 150, 80, 0.08) 47%,
+    rgba(210, 140, 70, 0.15) 50%,
+    rgba(200, 130, 65, 0.18) 54%,
+    rgba(180, 110, 55, 0.14) 60%,
+    rgba(160, 90, 45, 0.08) 68%,
+    transparent 78%
+  );
+  box-shadow: inset -30px -15px 80px rgba(200, 130, 70, 0.1),
+    0 0 60px rgba(220, 140, 65, 0.15), 0 0 120px rgba(200, 120, 55, 0.1),
+    0 0 250px rgba(180, 100, 50, 0.06);
+}
+
+/* Terminator shadow (doesn't spin) */
+.mars-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    140deg,
+    transparent 25%,
+    rgba(0, 0, 0, 0.12) 36%,
+    rgba(0, 0, 0, 0.3) 45%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0.8) 68%,
+    rgba(0, 0, 0, 0.95) 85%
+  );
+}
+
+/* Bright rim light on the sunlit edge (doesn't spin) */
+.mars-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 28% 40%,
+    transparent 45%,
+    rgba(255, 200, 130, 0.12) 47%,
+    rgba(255, 200, 130, 0.05) 50%,
+    transparent 53%
+  );
+}
+
+@keyframes marsFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* ── Content container ── */
+
+.menu-content {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Title ── */
+
+.menu-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: bold;
+  color: #e8d0b0;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 30px rgba(220, 140, 60, 0.4),
+    0 0 80px rgba(200, 120, 50, 0.15), 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+.menu-subtitle {
+  margin-top: 0.5rem;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+  color: rgba(220, 160, 90, 0.6);
+  letter-spacing: 0.5em;
+}
+
+/* ── Story terminal ── */
+
+.menu-story {
+  background: rgba(40, 20, 10, 0.5);
+  border: 1px solid rgba(220, 140, 60, 0.15);
+  border-left: 3px solid rgba(220, 140, 60, 0.4);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  backdrop-filter: blur(4px);
+}
+
+.story-line {
+  margin: 0;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+  color: rgba(220, 160, 100, 0.55);
+  line-height: 1.6;
+  opacity: 0;
+  animation: typeIn 0.3s ease forwards;
+}
+
+.story-line:nth-child(1) {
+  animation-delay: 0.2s;
+}
+.story-line:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.story-line:nth-child(3) {
+  animation-delay: 1s;
+}
+.story-line:nth-child(4) {
+  animation-delay: 1.4s;
+}
+
+.story-highlight {
+  color: rgba(255, 200, 100, 0.95) !important;
+  font-weight: bold;
+  text-shadow: 0 0 12px rgba(255, 180, 60, 0.3);
+}
+
+@keyframes typeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Buttons ── */
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.menu-btn {
+  font-family: "Courier New", Courier, monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.9rem 1.5rem;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.menu-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.menu-btn .btn-text {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-weight: bold;
+  letter-spacing: 0.2em;
+}
+
+.menu-btn .btn-subtext {
+  font-size: clamp(0.55rem, 1.2vw, 0.65rem);
+  margin-top: 0.2rem;
+  letter-spacing: 0.15em;
+  opacity: 0.4;
+}
+
+.menu-btn-primary {
+  border-color: rgba(220, 140, 60, 0.7);
+  color: rgba(240, 185, 110, 1);
+  background: rgba(40, 20, 10, 0.5);
+}
+
+.menu-btn-primary:not(:disabled):hover {
+  background: rgba(220, 140, 60, 0.25);
+  border-color: rgba(220, 140, 60, 1);
+  box-shadow: 0 0 25px rgba(220, 140, 60, 0.2),
+    inset 0 0 25px rgba(220, 140, 60, 0.08);
+  color: rgba(255, 210, 140, 1);
+}
+
+.menu-btn-primary:not(:disabled):active {
+  background: rgba(220, 140, 60, 0.35);
+  transform: scale(0.98);
+}
+
+.menu-btn-primary.ready {
+  animation: readyPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes readyPulse {
+  0%,
+  100% {
+    border-color: rgba(220, 140, 60, 0.7);
+    box-shadow: none;
+  }
+  50% {
+    border-color: rgba(220, 140, 60, 1);
+    box-shadow: 0 0 20px rgba(220, 140, 60, 0.2);
+  }
+}
+
+/* ── Controls panel ── */
+
+.controls-panel {
+  overflow: hidden;
+  max-height: 300px;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.controls-panel.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+  padding: 0.5rem 0;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+  color: rgba(200, 160, 120, 0.4);
+}
+
+.control-item kbd {
+  font-family: "Courier New", Courier, monospace;
+  color: rgba(220, 160, 90, 0.7);
+  background: rgba(220, 140, 60, 0.06);
+  border: 1px solid rgba(220, 140, 60, 0.18);
+  padding: 0.15em 0.5em;
+  min-width: 5em;
+  text-align: center;
+  font-size: 0.85em;
+}
+
+/* ── Footer ── */
+
+.menu-footer {
+  font-size: clamp(0.55rem, 1.2vw, 0.65rem);
+  color: rgba(200, 160, 120, 0.2);
+  letter-spacing: 0.3em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.signal-indicator {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(220, 140, 60, 0.6);
+  box-shadow: 0 0 6px rgba(220, 140, 60, 0.3);
+  animation: signalBlink 3s ease-in-out infinite;
+}
+
+@keyframes signalBlink {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Static / grain overlay ── */
+
+.main-menu::after {
+  content: "";
+  position: absolute;
+  inset: -200%;
+  width: 500%;
+  height: 500%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 512px 512px;
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 2;
+  animation: staticFlicker 0.08s steps(8) infinite;
+}
+
+@keyframes staticFlicker {
+  0% {
+    transform: translate(0, 0);
+  }
+  12% {
+    transform: translate(-120px, 80px);
+  }
+  25% {
+    transform: translate(90px, -150px);
+  }
+  37% {
+    transform: translate(-60px, 200px);
+  }
+  50% {
+    transform: translate(170px, -40px);
+  }
+  62% {
+    transform: translate(-140px, -110px);
+  }
+  75% {
+    transform: translate(50px, 160px);
+  }
+  87% {
+    transform: translate(-180px, 30px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }

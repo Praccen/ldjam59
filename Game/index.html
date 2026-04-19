@@ -1,12 +1,80 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-	<head>
-        <title>Hello Typescript!</title>
-		<meta charset="utf-8">
-		<link rel="stylesheet" href="index.css">
-	</head>
+  <head>
+    <title>Cool Space Title</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-	<body>
-		<script type="module" src="./dist/main.esm.js"></script>
-	</body>
+  <body>
+    <div id="main-menu" class="main-menu">
+      <div class="menu-skybox"></div>
+
+      <!-- Mars -->
+      <div class="mars-planet">
+        <div class="mars-spin-group">
+          <div class="mars-surface"></div>
+        </div>
+        <div class="mars-atmosphere"></div>
+        <div class="mars-shadow"></div>
+        <div class="mars-rim"></div>
+      </div>
+
+      <div class="menu-content">
+        <div class="menu-header">
+          <h1 class="menu-title">Cool Space Title</h1>
+          <div class="menu-subtitle">MARS ORBIT // SOL 347</div>
+        </div>
+
+        <div class="menu-story">
+          <p class="story-line">&gt; SHIP STATUS: UNKNOWN</p>
+          <p class="story-line">&gt; COMET IMPACT SURVIVORS: ONE.</p>
+          <p class="story-line">&gt; LOCATION: DEBRIS FIELD, LOW MARS ORBIT</p>
+          <p class="story-line story-highlight">
+            &gt; OBJECTIVE: REBUILD ANTENNA. SIGNAL HOME.
+          </p>
+        </div>
+
+        <div class="menu-actions">
+          <button id="start-btn" class="menu-btn menu-btn-primary" disabled>
+            <span class="btn-text">LOADING...</span>
+            <span class="btn-subtext">SYSTEMS INITIALIZING</span>
+          </button>
+          <button id="controls-btn" class="menu-btn menu-btn-primary">
+            <span class="btn-text">CONTROLS</span>
+            <span class="btn-subtext">VIEW MANUAL</span>
+          </button>
+        </div>
+
+        <div id="controls-panel" class="controls-panel hidden">
+          <div class="controls-grid">
+            <div class="control-item"><kbd>W A S D</kbd><span>MOVE</span></div>
+            <div class="control-item"><kbd>MOUSE</kbd><span>LOOK</span></div>
+            <div class="control-item">
+              <kbd>E</kbd><span>ATTACH TO BLOCK</span>
+            </div>
+            <div class="control-item">
+              <kbd>SPACE</kbd><span>DETACH / JUMP</span>
+            </div>
+            <div class="control-item">
+              <kbd>LMB</kbd><span>PLACE BLOCK</span>
+            </div>
+            <div class="control-item">
+              <kbd>RMB</kbd><span>REMOVE BLOCK</span>
+            </div>
+            <div class="control-item">
+              <kbd>R</kbd><span>SPLIT PLATFORM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-footer">
+          <span class="signal-indicator"></span>
+          LUDUM DARE 59 — PRACCEN ENGINE
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./dist/main.esm.js"></script>
+  </body>
 </html>

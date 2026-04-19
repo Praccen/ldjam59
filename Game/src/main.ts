@@ -94,11 +94,34 @@ function animate() {
 }
 
 let progress = { requested: 0, loaded: 0 };
-// Start animating!
-gameContext.loadMeshes(progress).then(() => {
-  splashScreen.destroy();
+
+const mainMenu = document.getElementById("main-menu")!;
+const startBtn = document.getElementById("start-btn")! as HTMLButtonElement;
+const controlsBtn = document.getElementById("controls-btn")!;
+const controlsPanel = document.getElementById("controls-panel")!;
+
+controlsBtn.addEventListener("click", () => {
+  controlsPanel.classList.toggle("hidden");
+});
+
+function startGame() {
+  mainMenu.classList.add("hidden");
   gameContext.start();
   animate();
+}
+
+startBtn.addEventListener("click", () => {
+  if (!startBtn.disabled) {
+    startGame();
+  }
+});
+
+gameContext.loadMeshes(progress).then(() => {
+  splashScreen.destroy();
+  startBtn.disabled = false;
+  startBtn.classList.add("ready");
+  startBtn.querySelector(".btn-text")!.textContent = "LAUNCH";
+  startBtn.querySelector(".btn-subtext")!.textContent = "BEGIN MISSION";
 });
 
 function loadingScreenAnimate() {
