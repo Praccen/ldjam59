@@ -72,7 +72,7 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "Assets/Textures/8k_mars.jpg",
-        "CSS:rgb(0,0,0)",
+        "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 2000.0, 2000.0, 2000.0);
