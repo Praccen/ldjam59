@@ -403,6 +403,41 @@ export class Platform {
     this.addBlock(offset, type);
   }
 
+  showRemovableBlock(camera: Camera, player: Player) {
+    // Ignore  empty blocks
+    const filtered = [...this.attachedBlocks.values()]
+      .filter((block) => block.type == BlockType.EMPTY)
+      .map((block) => block.physicsObject);
+
+    let ray = new Ray();
+    ray.setStartAndDir(camera.getPosition(), camera.getDir());
+    let hit = this.physicsScene.doRayCast(
+      ray,
+      false,
+      [player.physicsObject, player.connectedBlock.physicsObject].concat(
+        filtered
+      ),
+      2.0
+    );
+    if (hit.object == undefined) {
+      return null;
+    }
+    let hitBlock = this.attachedBlocks.get(
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+    );
+
+    hitBlock.graphicsBundle.diffuse =
+      this.scene.renderer.textureStore.getTexture("CSS:rgba(255, 0, 0, 0.25)");
+
+    // TODO do this in a better way?
+    setTimeout(() => {
+      hitBlock.graphicsBundle.diffuse =
+        this.scene.renderer.textureStore.getTexture(
+          BlockTypeToColorMap.get(hitBlock.type)!
+        );
+    }, 500);
+  }
+
   showEmptyBlock(camera: Camera, player: Player) {
     // Ignore none empty blocks
     const filtered = [...this.attachedBlocks.values()]

@@ -216,6 +216,10 @@ export default class Player {
       this.jumping = false;
     }
 
+    if (Input.keys["SHIFT"]) {
+      platform.showRemovableBlock(camera, this);
+    }
+
     if (Input.mouseClicked) {
       if (!this.mouseWasClicked) {
         if (Input.keys["SHIFT"]) {
