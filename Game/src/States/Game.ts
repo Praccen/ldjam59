@@ -15,7 +15,12 @@ import { Input } from "../Input.js";
 import { sensitivity } from "./GameContext.js";
 import { gameContext } from "../main.js";
 import Player from "../Player.js";
-import { createDebrisShip, createStartingShip, Platform } from "../Platform.js";
+import {
+  Block,
+  createDebrisShip,
+  createStartingShip,
+  Platform,
+} from "../Platform.js";
 
 export default class Game {
   private renderer: Renderer3D;
@@ -33,6 +38,7 @@ export default class Game {
   private planet: GraphicsBundle;
   private startingPlatform: Platform;
   private debrisPlatform: Platform;
+  private detachedBlocks: Block[] = [];
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
     this.renderer = renderer;
@@ -175,8 +181,8 @@ export default class Game {
         if (
           this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
         ) {
-          this.debrisPlatform.splitPlatform(50);
-          this.startingPlatform.splitPlatform(130);
+          this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
+          this.startingPlatform.splitPlatform(this.detachedBlocks, 130);
           if (this.player.connectedBlock != null) {
             this.startingPlatform.resetWithNewBaseBlock(
               this.player.connectedBlock.graphicsBundle,
@@ -190,6 +196,19 @@ export default class Game {
     this.player.update(dt, this.camera, this.startingPlatform);
 
     this.physicsScene.update(dt);
+
+    // Clean up detached blocks that get far away, also make sure the player's connected block is not in the list.
+    this.detachedBlocks = this.detachedBlocks.filter((block) => {
+      if (block === this.player.connectedBlock) {
+        return false;
+      }
+      if (vec3.sqrLen(block.getWorldPos()) > Math.pow(400, 2.0)) {
+        this.scene.deleteGraphicsBundle(block.graphicsBundle);
+        this.physicsScene.removePhysicsObject(block.physicsObject);
+        return false;
+      }
+      return true;
+    });
   }
 
   preRenderingUpdate(dt: number) {

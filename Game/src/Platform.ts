@@ -429,7 +429,7 @@ export class Platform {
     this.attachedBlocks.delete(key);
   }
 
-  splitPlatform(pieceMass: number = 1.0) {
+  splitPlatform(detachedBlocks: Block[], pieceMass: number = 1.0) {
     for (let block of this.attachedBlocks) {
       if (block[1] == undefined) {
         continue;
@@ -467,6 +467,7 @@ export class Platform {
         vec3.fromValues(Math.random(), Math.random(), Math.random()),
         Math.random() * 25.0
       );
+      detachedBlocks.push(block[1]!);
     }
     this.attachedBlocks.clear();
     this.physicsObjectIdToAttachedBlocksKey.clear();
