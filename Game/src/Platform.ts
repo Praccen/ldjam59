@@ -38,6 +38,149 @@ const BlockTypeToMeshMap = new Map<BlockType, string>([
   [BlockType.ANTENNA3, "Assets/objs/spaceantenna3.obj"],
 ]);
 
+export function createStartingShip(
+  platform: Platform,
+  baseBlockStartingPosition: vec3,
+  player?: Player
+) {
+  platform
+    .addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE)
+    .then((baseBlock) => {
+      baseBlock.graphicsBundle.transform.position = baseBlockStartingPosition;
+
+      platform.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 3, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 4, 0), BlockType.BASE);
+
+      platform.addBlock(vec3.fromValues(1, 4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(2, 4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(-1, 4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(-2, 4, 0), BlockType.SOLARPANEL);
+
+      platform
+        .addBlock(vec3.fromValues(0, 4, 1), BlockType.SOLARPANEL)
+        .then((block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
+        });
+      platform
+        .addBlock(vec3.fromValues(0, 4, 2), BlockType.SOLARPANEL)
+        .then((block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
+        });
+
+      platform.addBlock(vec3.fromValues(0, 4, -1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, 4, -2), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, 5, 0), BlockType.ANTENNA1);
+      platform.addBlock(vec3.fromValues(0, 6, 0), BlockType.ANTENNA2);
+      platform.addBlock(vec3.fromValues(0, 7, 0), BlockType.ANTENNA3);
+
+      platform.addBlock(vec3.fromValues(-1, 0, -1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 0, -1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(1, 0, -1), BlockType.FLOOR);
+
+      platform.addBlock(vec3.fromValues(1, 0, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(-1, 0, 0), BlockType.FLOOR);
+
+      platform
+        .addBlock(vec3.fromValues(2, 0, 0), BlockType.ANTENNA3)
+        .then((block) => {
+          quat.fromEuler(block.graphicsBundle.transform.rotation, 90, 90, 0);
+        });
+
+      platform.addBlock(vec3.fromValues(-1, 0, 1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 0, 1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(1, 0, 1), BlockType.FLOOR);
+
+      platform.addBlock(vec3.fromValues(0, 0, 2), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 0, 3), BlockType.FLOOR);
+      platform
+        .addBlock(vec3.fromValues(1, 0, 3), BlockType.BASE)
+        .then((block) => {
+          if (player) {
+            player.setConnectedBlock(block, false);
+          }
+        });
+
+      platform.addBlock(vec3.fromValues(0, -1, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -2, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -3, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -4, 0), BlockType.BASE);
+
+      platform.addBlock(vec3.fromValues(1, -4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(2, -4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(-1, -4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(-2, -4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, -4, 1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, -4, 2), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, -4, -1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, -4, -2), BlockType.SOLARPANEL);
+    });
+}
+
+export function createDebrisShip(
+  platform: Platform,
+  baseBlockStartingPosition: vec3
+) {
+  platform
+    .addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE)
+    .then((baseBlock) => {
+      baseBlock.graphicsBundle.transform.position = baseBlockStartingPosition;
+      baseBlock.physicsObject.drag = 0.0;
+
+      platform.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 3, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 4, 0), BlockType.BASE);
+
+      platform.addBlock(vec3.fromValues(1, 4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(2, 4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(-1, 4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(-2, 4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, 4, -1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, 4, -2), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, 5, 0), BlockType.ANTENNA1);
+      platform.addBlock(vec3.fromValues(0, 6, 0), BlockType.ANTENNA2);
+      platform.addBlock(vec3.fromValues(0, 7, 0), BlockType.ANTENNA3);
+
+      platform.addBlock(vec3.fromValues(-1, 0, -1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 0, -1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(1, 0, -1), BlockType.FLOOR);
+
+      platform.addBlock(vec3.fromValues(1, 0, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(-1, 0, 0), BlockType.FLOOR);
+
+      platform.addBlock(vec3.fromValues(-1, 0, 1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, 0, 1), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(1, 0, 1), BlockType.FLOOR);
+
+      platform.addBlock(vec3.fromValues(0, -1, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -2, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -3, 0), BlockType.FLOOR);
+      platform.addBlock(vec3.fromValues(0, -4, 0), BlockType.BASE);
+
+      platform.addBlock(vec3.fromValues(1, -4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(2, -4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(-1, -4, 0), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(-2, -4, 0), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, -4, 1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, -4, 2), BlockType.SOLARPANEL);
+
+      platform.addBlock(vec3.fromValues(0, -4, -1), BlockType.SOLARPANEL);
+      platform.addBlock(vec3.fromValues(0, -4, -2), BlockType.SOLARPANEL);
+    });
+}
+
 export class Block {
   graphicsBundle: GraphicsBundle;
   physicsObject: PhysicsObject;
@@ -81,87 +224,9 @@ export class Platform {
     string
   >();
 
-  constructor(
-    scene: Scene,
-    physicsScene: PhysicsScene,
-    baseBlockStartingPosition: vec3,
-    player?: Player
-  ) {
+  constructor(scene: Scene, physicsScene: PhysicsScene) {
     this.scene = scene;
     this.physicsScene = physicsScene;
-
-    this.addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE).then(() => {
-      this.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 3, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 4, 0), BlockType.BASE);
-
-      this.addBlock(vec3.fromValues(1, 4, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(2, 4, 0), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(-1, 4, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(-2, 4, 0), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(0, 4, 1), BlockType.SOLARPANEL).then(
-        (block) => {
-          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
-        }
-      );
-      this.addBlock(vec3.fromValues(0, 4, 2), BlockType.SOLARPANEL).then(
-        (block) => {
-          quat.fromEuler(block.graphicsBundle.transform.rotation, 0, 0, 90);
-        }
-      );
-
-      this.addBlock(vec3.fromValues(0, 4, -1), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(0, 4, -2), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(0, 5, 0), BlockType.ANTENNA1);
-      this.addBlock(vec3.fromValues(0, 6, 0), BlockType.ANTENNA2);
-      this.addBlock(vec3.fromValues(0, 7, 0), BlockType.ANTENNA3);
-
-      this.addBlock(vec3.fromValues(-1, 0, -1), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 0, -1), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(1, 0, -1), BlockType.FLOOR);
-
-      this.addBlock(vec3.fromValues(1, 0, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.FLOOR);
-
-      this.addBlock(vec3.fromValues(2, 0, 0), BlockType.ANTENNA3).then(
-        (block) => {
-          quat.fromEuler(block.graphicsBundle.transform.rotation, 90, 90, 0);
-        }
-      );
-
-      this.addBlock(vec3.fromValues(-1, 0, 1), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 0, 1), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(1, 0, 1), BlockType.FLOOR);
-
-      this.addBlock(vec3.fromValues(0, 0, 2), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, 0, 3), BlockType.BASE);
-      this.addBlock(vec3.fromValues(1, 0, 3), BlockType.FLOOR).then((block) => {
-        if (player) {
-          player.setConnectedBlock(block, false);
-        }
-      });
-
-      this.addBlock(vec3.fromValues(0, -1, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, -2, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, -3, 0), BlockType.FLOOR);
-      this.addBlock(vec3.fromValues(0, -4, 0), BlockType.BASE);
-
-      this.addBlock(vec3.fromValues(1, -4, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(2, -4, 0), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(-1, -4, 0), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(-2, -4, 0), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(0, -4, 1), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(0, -4, 2), BlockType.SOLARPANEL);
-
-      this.addBlock(vec3.fromValues(0, -4, -1), BlockType.SOLARPANEL);
-      this.addBlock(vec3.fromValues(0, -4, -2), BlockType.SOLARPANEL);
-    });
   }
 
   resetWithNewBaseBlock(
@@ -361,7 +426,7 @@ export class Platform {
     this.attachedBlocks.delete(key);
   }
 
-  splitPlatform() {
+  splitPlatform(pieceMass: number = 1.0) {
     for (let block of this.attachedBlocks) {
       if (block[1] == undefined) {
         continue;
@@ -379,7 +444,12 @@ export class Platform {
       block[1]!.graphicsBundle.transform.parentTransform = null!;
 
       block[1]!.physicsObject.isImmovable = false;
+      block[1]!.physicsObject.mass = pieceMass;
       block[1]!.physicsObject.collisionCoefficient = 0.2;
+      vec3.copy(
+        block[1]!.physicsObject.velocity,
+        this.baseBlock.physicsObject.velocity
+      );
       vec3.scale(
         block[1]!.physicsObject.impulse,
         vec3.fromValues(Math.random(), Math.random(), Math.random()),

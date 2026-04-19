@@ -15,7 +15,7 @@ import { Input } from "../Input.js";
 import { sensitivity } from "./GameContext.js";
 import { gameContext } from "../main.js";
 import Player from "../Player.js";
-import { Platform } from "../Platform.js";
+import { createDebrisShip, createStartingShip, Platform } from "../Platform.js";
 
 export default class Game {
   private renderer: Renderer3D;
@@ -31,7 +31,8 @@ export default class Game {
 
   private sun: GraphicsBundle;
   private planet: GraphicsBundle;
-  private testPlatform: Platform;
+  private startingPlatform: Platform;
+  private debrisPlatform: Platform;
 
   constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
     this.renderer = renderer;
@@ -76,6 +77,7 @@ export default class Game {
       .then((gb) => {
         vec3.set(gb.transform.scale, 2000.0, 2000.0, 2000.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
+        quat.fromEuler(gb.transform.rotation, 0.0, 90.0, 180.0);
         this.planet = gb;
       });
 
@@ -105,12 +107,15 @@ export default class Game {
         this.sun = gb;
       });
 
-    this.testPlatform = new Platform(
-      this.scene,
-      this.physicsScene,
+    this.startingPlatform = new Platform(this.scene, this.physicsScene);
+    createStartingShip(
+      this.startingPlatform,
       vec3.fromValues(0.0, 0.0, 2.0),
       this.player
     );
+
+    this.debrisPlatform = new Platform(this.scene, this.physicsScene);
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(800.0, 0.0, 0.0));
   }
 
   resize(width: number, height: number) {
@@ -145,17 +150,61 @@ export default class Game {
     }
 
     if (
-      this.testPlatform != undefined &&
-      this.testPlatform.baseBlock != undefined
+      this.startingPlatform != undefined &&
+      this.startingPlatform.baseBlock != undefined
     ) {
       quat.rotateX(
-        this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
-        this.testPlatform.baseBlock.graphicsBundle.transform.rotation,
+        this.startingPlatform.baseBlock.graphicsBundle.transform.rotation,
+        this.startingPlatform.baseBlock.graphicsBundle.transform.rotation,
         0.1 * dt
       );
     }
 
-    this.player.update(dt, this.camera, this.testPlatform);
+    if (
+      this.debrisPlatform != undefined &&
+      this.debrisPlatform.baseBlock != undefined
+    ) {
+      quat.rotateZ(
+        this.debrisPlatform.baseBlock.graphicsBundle.transform.rotation,
+        this.debrisPlatform.baseBlock.graphicsBundle.transform.rotation,
+        2.0 * dt
+      );
+
+      if (
+        this.startingPlatform != undefined &&
+        this.startingPlatform.baseBlock != undefined
+      ) {
+        vec3.sub(
+          this.debrisPlatform.baseBlock.physicsObject.velocity,
+          this.startingPlatform.baseBlock.physicsObject.transform.position,
+          this.debrisPlatform.baseBlock.physicsObject.transform.position
+        );
+        vec3.normalize(
+          this.debrisPlatform.baseBlock.physicsObject.velocity,
+          this.debrisPlatform.baseBlock.physicsObject.velocity
+        );
+        vec3.scale(
+          this.debrisPlatform.baseBlock.physicsObject.velocity,
+          this.debrisPlatform.baseBlock.physicsObject.velocity,
+          50
+        );
+
+        if (
+          this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
+        ) {
+          this.debrisPlatform.splitPlatform(50);
+          this.startingPlatform.splitPlatform(130);
+          if (this.player.connectedBlock != null) {
+            this.startingPlatform.resetWithNewBaseBlock(
+              this.player.connectedBlock.graphicsBundle,
+              this.player.connectedBlock.physicsObject
+            );
+          }
+        }
+      }
+    }
+
+    this.player.update(dt, this.camera, this.startingPlatform);
 
     this.physicsScene.update(dt);
   }

@@ -17,7 +17,7 @@ export default class Player {
   jaw: number = 0.0;
 
   private mouseWasClicked: boolean = false;
-  private connectedBlock: Block = null;
+  connectedBlock: Block = null;
   private lerpSpeed: number = 2.5;
   private lerpMovefloating: boolean = false;
 
@@ -88,7 +88,7 @@ export default class Player {
           this.physicsObject.transform.position,
           this.physicsObject.transform.position,
           targetPos,
-          t,
+          t
         );
       } else {
         this.physicsObject.transform.position = targetPos;
@@ -109,11 +109,11 @@ export default class Player {
     vec3.transformQuat(
       camOffset,
       camOffset,
-      this.physicsObject.transform.rotation,
+      this.physicsObject.transform.rotation
     );
 
     camera.setPosition(
-      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset),
+      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
     );
 
     camera.setPitchJawDegrees(this.pitch, this.jaw);
@@ -135,7 +135,7 @@ export default class Player {
         ray,
         true,
         [this.physicsObject],
-        3.0,
+        3.0
       );
       if (hit.object != undefined) {
         let block = platform.getBlockFromPhysicsObject(hit.object);
@@ -163,20 +163,10 @@ export default class Player {
         vec3.transformQuat(
           vec3.create(),
           vec3.fromValues(0.0, 1.0, 0.0),
-          this.physicsObject.transform.rotation,
+          this.physicsObject.transform.rotation
         ),
-        jumpForce,
+        jumpForce
       );
-    }
-
-    if (Input.keys["R"]) {
-      platform.splitPlatform();
-      if (this.connectedBlock != null) {
-        platform.resetWithNewBaseBlock(
-          this.connectedBlock.graphicsBundle,
-          this.connectedBlock.physicsObject,
-        );
-      }
     }
 
     if (Input.mouseClicked) {
