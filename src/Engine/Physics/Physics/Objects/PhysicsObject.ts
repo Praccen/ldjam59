@@ -1,3 +1,4 @@
+import { quat } from "gl-matrix";
 import { GraphicsBundle, mat4, vec3 } from "../../../../Engine";
 import GraphicsObject from "../../../Rendering/Objects/GraphicsObjects/GraphicsObject";
 import Transform from "../../../Shared/Transform";
@@ -21,6 +22,7 @@ export default class PhysicsObject {
   impulse: vec3 = vec3.create();
   force: vec3 = vec3.create();
   physicsObjectId: number;
+  momentum: vec3 = vec3.create();
 
   /**
    * True if this object never moves

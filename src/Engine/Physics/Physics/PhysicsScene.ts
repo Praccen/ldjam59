@@ -9,6 +9,7 @@ import { IntersectionTester } from "./IntersectionTester";
 import PhysicsObject from "./Objects/PhysicsObject";
 import Ray from "./Shapes/Ray";
 import Shape from "./Shapes/Shape";
+import { quat } from "gl-matrix";
 
 export class TreePhysicsContentElement extends TreeNodeContentElement {
   physicsObject: PhysicsObject;
@@ -346,8 +347,22 @@ export default class PhysicsScene {
           vec3.add(vec3.create(), oldVelocity, physicsObject.velocity),
           0.5 * dt,
         );
-        if (vec3.len(translation) > 0.001) {
+
+        if (
+          vec3.len(translation) > 0.001 ||
+          vec3.len(physicsObject.momentum) > 0.001
+        ) {
           physicsObject.transform.translate(translation);
+          quat.multiply(
+            physicsObject.transform.rotation,
+            physicsObject.transform.rotation,
+            quat.fromEuler(
+              quat.create(),
+              physicsObject.momentum[0] * dt,
+              physicsObject.momentum[1] * dt,
+              physicsObject.momentum[2] * dt,
+            ),
+          );
           physicsObject.transform.calculateMatrices();
         }
       }

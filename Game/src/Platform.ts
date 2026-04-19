@@ -47,6 +47,7 @@ export function createStartingShip(
     .addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE)
     .then((baseBlock) => {
       baseBlock.graphicsBundle.transform.position = baseBlockStartingPosition;
+      vec3.set(baseBlock.physicsObject.momentum, 2.0, 0.0, 0.0);
 
       platform.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
       platform.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
@@ -132,6 +133,7 @@ export function createDebrisShip(
     .then((baseBlock) => {
       baseBlock.graphicsBundle.transform.position = baseBlockStartingPosition;
       baseBlock.physicsObject.drag = 0.0;
+      vec3.set(baseBlock.physicsObject.momentum, 90.0, 56.0, 82.0);
 
       platform.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
       platform.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);
@@ -448,6 +450,14 @@ export class Platform {
       block[1]!.physicsObject.mass = pieceMass;
       block[1]!.physicsObject.collisionCoefficient = 0.2;
       block[1]!.physicsObject.internalTree = null!;
+
+      vec3.set(
+        block[1]!.physicsObject.momentum,
+        Math.random() * 20.0,
+        Math.random() * 20.0,
+        Math.random() * 20.0
+      );
+
       vec3.copy(
         block[1]!.physicsObject.velocity,
         this.baseBlock.physicsObject.velocity

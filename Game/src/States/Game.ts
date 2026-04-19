@@ -150,26 +150,9 @@ export default class Game {
     }
 
     if (
-      this.startingPlatform != undefined &&
-      this.startingPlatform.baseBlock != undefined
-    ) {
-      quat.rotateX(
-        this.startingPlatform.baseBlock.graphicsBundle.transform.rotation,
-        this.startingPlatform.baseBlock.graphicsBundle.transform.rotation,
-        0.1 * dt
-      );
-    }
-
-    if (
       this.debrisPlatform != undefined &&
       this.debrisPlatform.baseBlock != undefined
     ) {
-      quat.rotateZ(
-        this.debrisPlatform.baseBlock.graphicsBundle.transform.rotation,
-        this.debrisPlatform.baseBlock.graphicsBundle.transform.rotation,
-        2.0 * dt
-      );
-
       if (
         this.startingPlatform != undefined &&
         this.startingPlatform.baseBlock != undefined
