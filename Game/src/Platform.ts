@@ -18,6 +18,7 @@ export enum BlockType {
   ANTENNA1,
   ANTENNA2,
   ANTENNA3,
+  EMPTY,
 }
 
 const BlockTypeToColorMap = new Map<BlockType, string>([
@@ -27,6 +28,7 @@ const BlockTypeToColorMap = new Map<BlockType, string>([
   [BlockType.ANTENNA1, "Assets/Textures/palette.png"],
   [BlockType.ANTENNA2, "Assets/Textures/palette.png"],
   [BlockType.ANTENNA3, "Assets/Textures/palette.png"],
+  [BlockType.EMPTY, "CSS:rgba(0, 255, 0, 0.25)"],
 ]);
 
 const BlockTypeToMeshMap = new Map<BlockType, string>([
@@ -36,6 +38,7 @@ const BlockTypeToMeshMap = new Map<BlockType, string>([
   [BlockType.ANTENNA1, "Assets/objs/spaceantenna1.obj"],
   [BlockType.ANTENNA2, "Assets/objs/spaceantenna2.obj"],
   [BlockType.ANTENNA3, "Assets/objs/spaceantenna3.obj"],
+  [BlockType.EMPTY, "Assets/objs/spacefloor.obj"],
 ]);
 
 export function createStartingShip(
@@ -271,13 +274,22 @@ export class Platform {
   addBlock(offset: vec3, type: BlockType): Promise<Block> {
     return new Promise<Block>(async (resolve, reject) => {
       if (this.attachedBlocks.has(offset.toString())) {
-        reject("Grid spot taken");
+        if (
+          type != BlockType.EMPTY &&
+          this.attachedBlocks.get(offset.toString()).type == BlockType.EMPTY
+        ) {
+          this.removeBlock(offset.toString());
+        } else {
+          reject("Grid spot taken");
+        }
       }
 
-      if (this.baseBlock == undefined) {
-        type = BlockType.BASE;
-        if (vec3.sqrLen(offset) > 0.0001) {
-          reject("No base block in platform yet");
+      if (type != BlockType.EMPTY) {
+        if (this.baseBlock == undefined) {
+          type = BlockType.BASE;
+          if (vec3.sqrLen(offset) > 0.0001) {
+            reject("No base block in platform yet");
+          }
         }
       }
 
@@ -289,6 +301,9 @@ export class Platform {
           "CSS:rgb(0,0,0)"
         )
         .then((gb) => {
+          if (type == BlockType.EMPTY) {
+            gb.enabled = false;
+          }
           gb.emission = this.scene.renderer.textureStore.getTexture(
             "Assets/Textures/emissionpalette.png"
           );
@@ -302,7 +317,6 @@ export class Platform {
           );
           physicsObject.setupInternalTreeFromGraphicsObject(gb.graphicsObject);
           physicsObject.collisionCoefficient = 0.2;
-
           let block = new Block(gb, physicsObject, type);
           if (vec3.sqrLen(offset) < 0.0001) {
             this.baseBlock = block;
@@ -314,6 +328,33 @@ export class Platform {
           );
           resolve(block);
         });
+      if (type != BlockType.EMPTY) {
+        // Add empty blocks around this block
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(1, 0, 0)),
+          BlockType.EMPTY
+        );
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(-1, 0, 0)),
+          BlockType.EMPTY
+        );
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(0, 1, 0)),
+          BlockType.EMPTY
+        );
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(0, -1, 0)),
+          BlockType.EMPTY
+        );
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(0, 0, 1)),
+          BlockType.EMPTY
+        );
+        this.addBlock(
+          vec3.add(vec3.create(), offset, vec3.fromValues(0, 0, -1)),
+          BlockType.EMPTY
+        );
+      }
     });
   }
 
@@ -390,6 +431,35 @@ export class Platform {
       ),
       type
     );
+  }
+
+  showEmptyBlock(camera: Camera, player: Player) {
+    const filterd = [...this.attachedBlocks.values()]
+      .filter((block) => block.type != BlockType.EMPTY)
+      .map((block) => block.physicsObject);
+
+    let ray = new Ray();
+    ray.setStartAndDir(camera.getPosition(), camera.getDir());
+    let hit = this.physicsScene.doRayCast(
+      ray,
+      true,
+      [player.physicsObject, player.connectedBlock.physicsObject].concat(
+        filterd
+      ),
+      100.0
+    );
+    if (hit.object == undefined) {
+      return null;
+    }
+    let hitEmptyBlock = this.attachedBlocks.get(
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+    );
+    hitEmptyBlock.graphicsBundle.enabled = true;
+
+    // TODO do this in a better way
+    setTimeout(() => {
+      hitEmptyBlock.graphicsBundle.enabled = false;
+    }, 1000);
   }
 
   removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {

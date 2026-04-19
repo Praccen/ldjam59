@@ -128,8 +128,8 @@ export default class Game {
       this.player
     );
 
-    this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+    // this.debrisPlatform = new Platform(this.scene, this.physicsScene);
+    // createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
   }
 
   resize(width: number, height: number) {
