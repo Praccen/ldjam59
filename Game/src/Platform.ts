@@ -104,7 +104,10 @@ export function createStartingShip(
         .addBlock(vec3.fromValues(1, 0, 3), BlockType.BASE)
         .then((block) => {
           if (player) {
-            player.setConnectedBlock(block, false);
+            // player.setConnectedBlock(
+            //   this.attachedBlocks.get(vec3.fromValues(1, 1, 3).toString()),
+            //   false
+            // );
           }
         });
 
@@ -228,10 +231,7 @@ export class Platform {
   ];
 
   baseBlock: Block;
-  private attachedBlocks: Map<string, Block | undefined> = new Map<
-    string,
-    Block
-  >();
+  attachedBlocks: Map<string, Block | undefined> = new Map<string, Block>();
   private physicsObjectIdToAttachedBlocksKey: Map<number, string> = new Map<
     number,
     string
@@ -310,9 +310,6 @@ export class Platform {
           "CSS:rgb(0,0,0)"
         )
         .then((gb) => {
-          if (type == BlockType.EMPTY) {
-            gb.enabled = false;
-          }
           gb.emission = this.scene.renderer.textureStore.getTexture(
             "Assets/Textures/emissionpalette.png"
           );
@@ -324,6 +321,10 @@ export class Platform {
           let physicsObject = this.physicsScene.addNewPhysicsObject(
             gb.transform
           );
+          if (type == BlockType.EMPTY) {
+            gb.enabled = false;
+            physicsObject.isCollidable = false;
+          }
           physicsObject.setupInternalTreeFromGraphicsObject(gb.graphicsObject);
           physicsObject.collisionCoefficient = 0.2;
           let block = new Block(gb, physicsObject, type);
@@ -376,7 +377,7 @@ export class Platform {
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
     let hit = this.physicsScene.doRayCast(
       ray,
-      true,
+      false,
       [player.physicsObject, player.connectedBlock.physicsObject].concat(
         filtered
       ),
@@ -410,7 +411,7 @@ export class Platform {
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
     let hit = this.physicsScene.doRayCast(
       ray,
-      true,
+      false,
       [player.physicsObject, player.connectedBlock.physicsObject].concat(
         filtered
       ),

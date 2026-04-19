@@ -70,6 +70,14 @@ export default class Player {
   }
 
   update(dt: number, camera: Camera, platform: Platform) {
+    if (this.connectedBlock == null) {
+      this.setConnectedBlock(
+        // TODO Dont do this, keep it private
+        platform.attachedBlocks.get(vec3.fromValues(1, 1, 3).toString()),
+        false
+      );
+    }
+
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
     if (document.pointerLockElement == document.body) {
@@ -134,7 +142,7 @@ export default class Player {
   }
 
   updateCamera(camera: Camera) {
-    let camOffset = vec3.fromValues(0.0, 1.8, 0.0);
+    let camOffset = vec3.fromValues(0.0, 0.0, 0.0);
     vec3.transformQuat(
       camOffset,
       camOffset,
@@ -157,22 +165,24 @@ export default class Player {
 
   handleInput(camera: Camera, platform: Platform) {
     // Move to block ad point
-    if (!this.picking && Input.keys["E"]) {
-      let ray = new Ray();
-      ray.setStartAndDir(camera.getPosition(), camera.getDir());
-      let hit = this.physicsScene.doRayCast(
-        ray,
-        true,
-        [this.physicsObject],
-        3.0
-      );
-      if (hit.object != undefined) {
-        let block = platform.getBlockFromPhysicsObject(hit.object);
-        if (block) {
-          this.setConnectedBlock(block);
-          this.physicsObject.velocity = vec3.create();
-          this.physicsObject.impulse = vec3.create();
-          this.physicsObject.force = vec3.create();
+    if (Input.keys["E"]) {
+      if (!this.picking) {
+        let ray = new Ray();
+        ray.setStartAndDir(camera.getPosition(), camera.getDir());
+        let hit = this.physicsScene.doRayCast(
+          ray,
+          false,
+          [this.physicsObject, this.connectedBlock.physicsObject],
+          3.0
+        );
+        if (hit.object != undefined) {
+          let block = platform.getBlockFromPhysicsObject(hit.object);
+          if (block && block.type == BlockType.EMPTY) {
+            this.setConnectedBlock(block);
+            this.physicsObject.velocity = vec3.create();
+            this.physicsObject.impulse = vec3.create();
+            this.physicsObject.force = vec3.create();
+          }
         }
       }
       this.picking = true;
