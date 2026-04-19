@@ -430,6 +430,10 @@ export default class Scene {
       return;
     }
 
+    if (!this.useTrees) {
+      return;
+    }
+
     for (const bundle of this.graphicBundles) {
       bundle.enabled = false;
     }
