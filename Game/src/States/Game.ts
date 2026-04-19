@@ -74,7 +74,7 @@ export default class Game {
         "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
-        vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
+        vec3.set(gb.transform.scale, 2000.0, 2000.0, 2000.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
         this.planet = gb;
       });
@@ -86,7 +86,7 @@ export default class Game {
         "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
-        vec3.set(gb.transform.scale, 1020.0, 1030.0, 1030.0);
+        vec3.set(gb.transform.scale, 2040.0, 2060.0, 2060.0);
         vec3.set(gb.transform.position, 0.0, -800.0, 800.0);
       });
 
@@ -97,7 +97,7 @@ export default class Game {
         "CSS:rgb(0,0,0)"
       )
       .then((gb) => {
-        vec3.set(gb.transform.scale, 500.0, 500.0, 500.0);
+        vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
         vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
         gb.emission = this.renderer.textureStore.getTexture(
           "CSS:rgb(233, 224, 64)"

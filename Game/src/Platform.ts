@@ -14,13 +14,19 @@ import Player from "./Player";
 export enum BlockType {
   BASE,
   FLOOR,
-  TEST,
+  SOLARPANEL,
 }
 
 const BlockTypeToColorMap = new Map<BlockType, string>([
-  [BlockType.BASE, "CSS:rgb(255, 0, 0)"],
-  [BlockType.FLOOR, "CSS:rgb(176, 176, 176)"],
-  [BlockType.TEST, "CSS:rgb(0, 255, 0)"],
+  [BlockType.BASE, "Assets/textures/palette.png"],
+  [BlockType.FLOOR, "Assets/textures/palette.png"],
+  [BlockType.SOLARPANEL, "Assets/textures/palette.png"],
+]);
+
+const BlockTypeToMeshMap = new Map<BlockType, string>([
+  [BlockType.BASE, "Assets/objs/spacebox.obj"],
+  [BlockType.FLOOR, "Assets/objs/spacefloor.obj"],
+  [BlockType.SOLARPANEL, "Assets/objs/spacesolar.obj"],
 ]);
 
 export class Block {
@@ -76,9 +82,10 @@ export class Platform {
     this.physicsScene = physicsScene;
 
     this.addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE).then(() => {
-      this.addBlock(vec3.fromValues(1, 0, 0), BlockType.TEST);
-      this.addBlock(vec3.fromValues(0, 0, 1), BlockType.TEST);
-      this.addBlock(vec3.fromValues(0, 1, 1), BlockType.TEST);
+      this.addBlock(vec3.fromValues(1, 0, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(0, 0, 1), BlockType.SOLARPANEL);
+      this.addBlock(vec3.fromValues(0, 0, -1), BlockType.SOLARPANEL);
       if (player) {
         player.setConnectedBlock(this.baseBlock, false);
       }
@@ -136,7 +143,7 @@ export class Platform {
       this.attachedBlocks.set(offset.toString(), undefined); // Reserve the spot
       await this.scene
         .addNewMesh(
-          "Assets/objs/cube.obj",
+          BlockTypeToMeshMap.get(type)!,
           BlockTypeToColorMap.get(type)!,
           "CSS:rgb(0,0,0)"
         )
@@ -297,11 +304,11 @@ export class Platform {
       block[1]!.graphicsBundle.transform.parentTransform = null!;
 
       block[1]!.physicsObject.isImmovable = false;
-      vec3.set(
+      block[1]!.physicsObject.collisionCoefficient = 0.2;
+      vec3.scale(
         block[1]!.physicsObject.impulse,
-        Math.random(),
-        Math.random(),
-        Math.random()
+        vec3.fromValues(Math.random(), Math.random(), Math.random()),
+        Math.random() * 25.0
       );
     }
     this.attachedBlocks.clear();

@@ -22,6 +22,8 @@ export default class MeshStore {
   private heightmapMap: Map<string, Promise<Heightmap>>;
   private textureStore: TextureStore;
 
+  normalizeObjVertices: boolean = false;
+
   constructor(renderer: RendererBase, textureStore: TextureStore) {
     this.renderer = renderer;
     this.meshMap = new Map<string, Promise<Mesh>>();
@@ -498,13 +500,38 @@ export default class MeshStore {
       }
     }
 
+    let minVertexPositions = vec3.fromValues(Infinity, Infinity, Infinity);
+    let maxVertexPositions = vec3.fromValues(-Infinity, -Infinity, -Infinity);
+
+    for (const vertexPosition of vertexPositions) {
+      vec3.min(minVertexPositions, minVertexPositions, vertexPosition);
+      vec3.max(maxVertexPositions, maxVertexPositions, vertexPosition);
+    }
+
+    let ratios = vec3.sub(
+      vec3.create(),
+      maxVertexPositions,
+      minVertexPositions,
+    );
+    let scale = 1.0 / Math.max(ratios[0], ratios[1], ratios[2]);
+
+    let origin = vec3.scaleAndAdd(
+      vec3.create(),
+      minVertexPositions,
+      ratios,
+      0.5,
+    );
+
     let returnArr = new Float32Array(vertices.length * 8); // 3 * pos + 3 * norm + 2 * tx
 
     for (let i = 0; i < vertices.length; i++) {
       if (!isNaN(vertices[i].posIndex)) {
-        returnArr[i * 8] = vertexPositions[vertices[i].posIndex][0];
-        returnArr[i * 8 + 1] = vertexPositions[vertices[i].posIndex][1];
-        returnArr[i * 8 + 2] = vertexPositions[vertices[i].posIndex][2];
+        returnArr[i * 8] =
+          (vertexPositions[vertices[i].posIndex][0] - origin[0]) * scale;
+        returnArr[i * 8 + 1] =
+          (vertexPositions[vertices[i].posIndex][1] - origin[1]) * scale;
+        returnArr[i * 8 + 2] =
+          (vertexPositions[vertices[i].posIndex][2] - origin[2]) * scale;
       } else {
         returnArr[i * 8] = 0.0;
         returnArr[i * 8 + 1] = 0.0;

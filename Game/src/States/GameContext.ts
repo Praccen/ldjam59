@@ -17,6 +17,7 @@ export default class GameContext {
   constructor() {
     // Create a renderer and attach it to the document body
     this.renderer = new Renderer3D();
+    this.renderer.meshStore.normalizeObjVertices = true;
     document.body.appendChild(this.renderer.domElement);
 
     this.renderer.useVolumetric = true;
