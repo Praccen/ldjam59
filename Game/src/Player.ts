@@ -1,9 +1,8 @@
-import { vec2, vec3, quat, mat4 } from "gl-matrix";
+import { vec2, vec3 } from "gl-matrix";
 import { Camera, PhysicsObject, PhysicsScene, Ray } from "praccen-web-engine";
 import { Input } from "./Input";
 import { Block, BlockType, Platform } from "./Platform";
 
-const acceleration: number = 20.0;
 const jumpForce: number = 1.5;
 const sensitivity: number = 0.4;
 
@@ -18,6 +17,7 @@ export default class Player {
 
   private mouseWasClicked: boolean = false;
   connectedBlock: Block = null;
+  tetheredBlock: Block = null;
   private lerpSpeed: number = 2.5;
   private lerpMovefloating: boolean = false;
 
@@ -25,6 +25,7 @@ export default class Player {
   private floating: boolean = true;
 
   private picking: boolean = false;
+  private jumping: boolean = false;
 
   constructor(physicsScene: PhysicsScene) {
     this.physicsScene = physicsScene;
@@ -51,8 +52,15 @@ export default class Player {
     };
   }
 
+  setTetheredBlock(block: Block) {
+    if (block != null) {
+      this.tetheredBlock = block;
+    }
+  }
+
   setConnectedBlock(block: Block, lerp: boolean = true) {
     this.connectedBlock = block;
+    this.setTetheredBlock(block);
     this.lerpMovefloating = lerp;
     if (block != null) {
       this.physicsObject.isImmovable = true;
@@ -101,6 +109,27 @@ export default class Player {
       }
 
       this.physicsObject.transform.rotation = this.connectedBlock.getWorldRot();
+    } else if (this.floating && this.tetheredBlock != null) {
+      const blockPos = this.tetheredBlock.getWorldPos();
+      const dist = vec3.distance(
+        this.physicsObject.transform.position,
+        blockPos
+      );
+      if (dist >= 5.0) {
+        vec3.scaleAndAdd(
+          this.physicsObject.impulse,
+          this.physicsObject.impulse,
+          vec3.normalize(
+            vec3.create(),
+            vec3.sub(
+              vec3.create(),
+              this.physicsObject.transform.position,
+              this.tetheredBlock.getWorldPos()
+            )
+          ),
+          -0.001 * Math.pow(dist, 2)
+        );
+      }
     }
   }
 
@@ -152,21 +181,38 @@ export default class Player {
     }
 
     // Jump off platform
-    if (Input.keys[" "] && this.connectedBlock != null) {
-      this.setConnectedBlock(null, false);
-      this.floating = true;
-      // this.connectedBlock = null;
-      // this.floating = true;
-      vec3.scaleAndAdd(
-        this.physicsObject.impulse,
-        this.physicsObject.impulse,
-        vec3.transformQuat(
-          vec3.create(),
-          vec3.fromValues(0.0, 1.0, 0.0),
-          this.physicsObject.transform.rotation
-        ),
-        jumpForce
-      );
+    if (!this.jumping && Input.keys[" "]) {
+      if (this.connectedBlock != null) {
+        this.setConnectedBlock(null, false);
+        this.floating = true;
+        vec3.scaleAndAdd(
+          this.physicsObject.impulse,
+          this.physicsObject.impulse,
+          vec3.transformQuat(
+            vec3.create(),
+            vec3.fromValues(0.0, 1.0, 0.0),
+            this.physicsObject.transform.rotation
+          ),
+          jumpForce
+        );
+      } else if (this.tetheredBlock != null) {
+        vec3.scaleAndAdd(
+          this.physicsObject.impulse,
+          this.physicsObject.impulse,
+          vec3.normalize(
+            vec3.create(),
+            vec3.sub(
+              vec3.create(),
+              this.physicsObject.transform.position,
+              this.tetheredBlock.getWorldPos()
+            )
+          ),
+          -0.1
+        );
+      }
+      this.jumping = true;
+    } else {
+      this.jumping = false;
     }
 
     if (Input.mouseClicked) {

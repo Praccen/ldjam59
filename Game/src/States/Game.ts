@@ -183,11 +183,11 @@ export default class Game {
         ) {
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
           this.startingPlatform.splitPlatform(this.detachedBlocks, 130);
-          if (this.player.connectedBlock != null) {
-            this.startingPlatform.resetWithNewBaseBlock(
-              this.player.connectedBlock.graphicsBundle,
-              this.player.connectedBlock.physicsObject
-            );
+          if (
+            this.player.connectedBlock != null ||
+            this.player.tetheredBlock != null
+          ) {
+            this.startingPlatform.resetWithNewBaseBlock(this.player);
           }
         }
       }

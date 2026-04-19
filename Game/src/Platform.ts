@@ -231,13 +231,19 @@ export class Platform {
     this.physicsScene = physicsScene;
   }
 
-  resetWithNewBaseBlock(
-    graphicsBundle: GraphicsBundle,
-    physicsObject: PhysicsObject
-  ) {
+  resetWithNewBaseBlock(player: Player) {
     this.attachedBlocks.clear();
     this.physicsObjectIdToAttachedBlocksKey.clear();
-    this.baseBlock = new Block(graphicsBundle, physicsObject, BlockType.BASE);
+    let activeBlock =
+      player.connectedBlock != null
+        ? player.connectedBlock
+        : player.tetheredBlock;
+    this.baseBlock = new Block(
+      activeBlock.graphicsBundle,
+      activeBlock.physicsObject,
+      BlockType.BASE
+    );
+    player.setTetheredBlock(this.baseBlock);
     this.baseBlock.physicsObject.isImmovable = true;
     vec3.zero(this.baseBlock.physicsObject.impulse);
     vec3.zero(this.baseBlock.physicsObject.force);
@@ -245,7 +251,7 @@ export class Platform {
 
     this.attachedBlocks.set(vec3.create().toString(), this.baseBlock);
     this.physicsObjectIdToAttachedBlocksKey.set(
-      physicsObject.physicsObjectId,
+      activeBlock.physicsObject.physicsObjectId,
       vec3.create().toString()
     );
   }
