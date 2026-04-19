@@ -30,10 +30,10 @@ export default class GameContext {
     // Set the class to apply style defined in index.css
     this.guiRenderer.domElement.className = "guiContainer";
 
-    this.game = new Game(this.renderer, this.guiRenderer);
-
     this.metaGui = new MetaGUI(this.guiRenderer);
     this.gameGui = new GameGUI(this.guiRenderer);
+
+    this.game = new Game(this.renderer, this.guiRenderer, this.gameGui);
   }
 
   resize(width: number, height: number) {

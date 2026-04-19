@@ -21,10 +21,12 @@ import {
   createStartingShip,
   Platform,
 } from "../Platform.js";
+import GameGUI from "../GUI/GameGUI.js";
 
 export default class Game {
   private renderer: Renderer3D;
   guiRenderer: GUIRenderer;
+  gameGUI: GameGUI;
 
   camera: Camera = new Camera();
   scene: Scene;
@@ -40,9 +42,14 @@ export default class Game {
   private debrisPlatform: Platform;
   private detachedBlocks: Block[] = [];
 
-  constructor(renderer: Renderer3D, guiRenderer: GUIRenderer) {
+  constructor(
+    renderer: Renderer3D,
+    guiRenderer: GUIRenderer,
+    gameGUI: GameGUI
+  ) {
     this.renderer = renderer;
     this.guiRenderer = guiRenderer;
+    this.gameGUI = gameGUI;
 
     this.renderer.useVolumetric = true;
     this.renderer.setFogTexture("CSS:rgb(255, 255, 255)");
@@ -66,7 +73,8 @@ export default class Game {
 
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
-    this.player = new Player(this.physicsScene);
+    this.player = new Player(this.physicsScene, this.guiRenderer, this.gameGUI);
+    this.scene.addNewShape(this.player.physicsObject.boundingBox);
 
     vec3.set(this.scene.getDirectionalLight().colour, 1.0, 1.0, 0.5);
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
@@ -121,7 +129,7 @@ export default class Game {
     );
 
     this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    createDebrisShip(this.debrisPlatform, vec3.fromValues(800.0, 0.0, 0.0));
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
   }
 
   resize(width: number, height: number) {
@@ -215,10 +223,9 @@ export default class Game {
           block.physicsObject.physicsObjectId
         )
       ) {
-        // Todo: Add this block to the player inventory
+        this.player.pickupBlock(block.type);
         this.scene.deleteGraphicsBundle(block.graphicsBundle);
         this.physicsScene.removePhysicsObject(block.physicsObject);
-        console.log("Picked up block of type: " + block.type);
         return false;
       }
       return true;

@@ -392,7 +392,7 @@ export class Platform {
     );
   }
 
-  removeBlockFromRayCast(camera: Camera, player: Player) {
+  removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
     let hit = this.physicsScene.doRayCast(
@@ -402,18 +402,24 @@ export class Platform {
       100.0
     );
     if (hit.object == undefined) {
-      return;
+      return null;
     }
 
     if (
       !this.physicsObjectIdToAttachedBlocksKey.has(hit.object.physicsObjectId)
     ) {
-      return;
+      return null;
     }
+
+    let type = this.attachedBlocks.get(
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+    )!.type;
 
     this.removeBlock(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     );
+
+    return type;
   }
 
   removeBlock(key: string) {

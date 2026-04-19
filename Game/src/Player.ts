@@ -1,16 +1,24 @@
 import { vec2, vec3 } from "gl-matrix";
-import { Camera, PhysicsObject, PhysicsScene, Ray } from "praccen-web-engine";
+import {
+  Camera,
+  GUIRenderer,
+  PhysicsObject,
+  PhysicsScene,
+  Ray,
+} from "praccen-web-engine";
 import { Input } from "./Input";
 import { Block, BlockType, Platform } from "./Platform";
+import GameGUI from "./GUI/GameGUI";
 
 const jumpForce: number = 1.5;
 const sensitivity: number = 0.4;
 
 export default class Player {
+  private guiRenderer: GUIRenderer;
+  private gameGUI: GameGUI;
+
   physicsScene: PhysicsScene;
   physicsObject: PhysicsObject;
-
-  mouseMovement: vec2 = vec2.create();
 
   pitch: number = 0.0;
   jaw: number = 0.0;
@@ -27,29 +35,21 @@ export default class Player {
   private picking: boolean = false;
   private jumping: boolean = false;
 
-  constructor(physicsScene: PhysicsScene) {
+  private inventory: Map<BlockType, number> = new Map<BlockType, number>();
+
+  constructor(
+    physicsScene: PhysicsScene,
+    guiRenderer: GUIRenderer,
+    gameGUI: GameGUI
+  ) {
+    this.guiRenderer = guiRenderer;
+    this.gameGUI = gameGUI;
     this.physicsScene = physicsScene;
     this.physicsObject = physicsScene.addNewPhysicsObject();
     vec3.set(this.physicsObject.transform.scale, 1.0, 2.0, 1.0);
     vec3.set(this.physicsObject.transform.origin, 0.0, -0.5, 0.0);
     vec3.set(this.physicsObject.transform.position, 0.0, 1.0, 0.0);
     this.physicsObject.drag = 0.0;
-
-    Input.mouseMoveCallBack = (event: MouseEvent) => {
-      let movX = event.movementX;
-      let movY = event.movementY;
-
-      if (Math.abs(movX) > window.innerWidth * 0.3) {
-        movX = 0.0;
-      }
-
-      if (Math.abs(movY) > window.innerHeight * 0.3) {
-        movY = 0.0;
-      }
-
-      this.mouseMovement[0] += movX;
-      this.mouseMovement[1] += movY;
-    };
   }
 
   setTetheredBlock(block: Block) {
@@ -227,12 +227,30 @@ export default class Player {
 
     if (Input.mouseRightClicked) {
       if (!this.mouseRightWasClicked) {
-        platform.removeBlockFromRayCast(camera, this);
+        let type = platform.removeBlockFromRayCast(camera, this);
+        if (type != undefined) {
+          this.pickupBlock(type!);
+        }
       }
 
       this.mouseRightWasClicked = true;
     } else {
       this.mouseRightWasClicked = false;
     }
+  }
+
+  pickupBlock(blockType: BlockType) {
+    let inventoryAmount = this.inventory.get(blockType);
+    if (inventoryAmount == undefined) {
+      inventoryAmount = 0;
+      // this.guiRenderer.getNew2DText(this.gameGUI.inventoryDiv);
+    }
+    this.inventory.set(blockType, inventoryAmount + 1);
+    console.log(
+      "BlockType:" +
+        BlockType[blockType] +
+        " : " +
+        (inventoryAmount + 1).toString()
+    );
   }
 }

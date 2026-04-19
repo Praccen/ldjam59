@@ -10,6 +10,8 @@ import {
 
 export default class GameGUI {
   gameGuiDiv: Div;
+
+  inventoryDiv: Div;
   constructor(guiRenderer: GUIRenderer) {
     this.gameGuiDiv = guiRenderer.getNewDiv();
     this.gameGuiDiv.getElement().style.width = "100%";
@@ -22,5 +24,9 @@ export default class GameGUI {
     crosshair.getElement().style.color = "white";
     crosshair.getElement().style.zIndex = "1";
     crosshair.center = true;
+
+    let inventoryDiv = guiRenderer.getNewDiv(this.gameGuiDiv);
+    inventoryDiv.position[0] = 0.8;
+    inventoryDiv.position[1] = 0.8;
   }
 }
