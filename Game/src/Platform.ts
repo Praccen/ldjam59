@@ -238,11 +238,7 @@ export class Platform {
       player.connectedBlock != null
         ? player.connectedBlock
         : player.tetheredBlock;
-    this.baseBlock = new Block(
-      activeBlock.graphicsBundle,
-      activeBlock.physicsObject,
-      BlockType.BASE
-    );
+    this.baseBlock = activeBlock;
     player.setTetheredBlock(this.baseBlock);
     this.baseBlock.physicsObject.isImmovable = true;
     vec3.zero(this.baseBlock.physicsObject.impulse);

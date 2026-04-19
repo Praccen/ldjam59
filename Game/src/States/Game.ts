@@ -199,7 +199,10 @@ export default class Game {
 
     // Clean up detached blocks that get far away, also make sure the player's connected block is not in the list.
     this.detachedBlocks = this.detachedBlocks.filter((block) => {
-      if (block === this.player.connectedBlock) {
+      if (
+        block === this.player.connectedBlock ||
+        block === this.player.tetheredBlock
+      ) {
         return false;
       }
       if (vec3.sqrLen(block.getWorldPos()) > Math.pow(400, 2.0)) {
