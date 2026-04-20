@@ -18,7 +18,7 @@
   "description": "Praccen's WebGL engine",
   "name": "praccen-web-engine",
   "scripts": {
-    "dev": "npm run dev --prefix Game",
+    "dev": "tsup --watch --onSuccess 'npm run build --prefix Game' & npm run dev --prefix Game",
     "build": "tsup && npm run build --prefix Game",
     "build:release": "NODE_ENV=production tsup",
     "setup": "npm install && npm link --prefix Game && npm install --prefix Game .",
