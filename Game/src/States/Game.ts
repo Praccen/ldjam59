@@ -44,6 +44,9 @@ export default class Game {
   private debrisPlatform: Platform;
   private detachedBlocks: Block[] = [];
 
+  private antennaBlocks: Map<Block, { target: vec3; arrived: boolean }> =
+    new Map();
+
   constructor(
     renderer: Renderer3D,
     guiRenderer: GUIRenderer,
@@ -224,8 +227,35 @@ export default class Game {
         if (
           this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
         ) {
+          const antenna1 = this.startingPlatform.getBlockAtOffset(
+            vec3.fromValues(0, 5, 0)
+          );
+          const antenna2 = this.startingPlatform.getBlockAtOffset(
+            vec3.fromValues(0, 6, 0)
+          );
+          const antenna3 = this.startingPlatform.getBlockAtOffset(
+            vec3.fromValues(0, 7, 0)
+          );
+
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
           this.startingPlatform.splitPlatform(this.detachedBlocks, 130);
+
+          const antennaTargets: [Block | undefined, vec3][] = [
+            [antenna1, vec3.fromValues(3, 0, 0)],
+            [antenna2, vec3.fromValues(0, 3, 0)],
+            [antenna3, vec3.fromValues(0, 0, 3)],
+          ];
+          for (const [block, target] of antennaTargets) {
+            if (block == null) continue;
+            block.physicsObject.isImmovable = true;
+            vec3.zero(block.physicsObject.velocity);
+            vec3.zero(block.physicsObject.impulse);
+            this.antennaBlocks.set(block, {
+              target,
+              arrived: false,
+            });
+          }
+
           if (
             this.player.connectedBlock != null ||
             this.player.tetheredBlock != null
@@ -241,6 +271,23 @@ export default class Game {
 
     this.player.update(dt, this.camera, this.startingPlatform);
 
+    // Move and lock antennas
+    for (const [block, state] of this.antennaBlocks) {
+      if (!state.arrived) {
+        const pos = block.graphicsBundle.transform.position;
+        const dir = vec3.sub(vec3.create(), state.target, pos);
+        const dist = vec3.len(dir);
+        if (dist > 0.02) {
+          const step = Math.min(dist, 2.0 * dt);
+          vec3.normalize(dir, dir);
+          vec3.scaleAndAdd(pos, pos, dir, step);
+        } else {
+          vec3.copy(pos, state.target);
+          state.arrived = true;
+        }
+      }
+    }
+
     this.physicsScene.update(dt);
 
     // Clean up detached blocks that get far away, also make sure the player's connected block is not in the list.
@@ -250,6 +297,10 @@ export default class Game {
         block === this.player.tetheredBlock
       ) {
         return false;
+      }
+      // Keep antenna blocks that are still lerping to their final positions.
+      if (this.antennaBlocks.has(block)) {
+        return true;
       }
       if (vec3.sqrLen(block.getWorldPos()) > Math.pow(400, 2.0)) {
         this.scene.deleteGraphicsBundle(block.graphicsBundle);

@@ -291,7 +291,7 @@ export class Platform {
       return undefined;
     }
 
-    return this.attachedBlocks.get(
+    return this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(
         physicsObject.physicsObjectId
       ) ?? ""
@@ -303,7 +303,7 @@ export class Platform {
       // Replace if empty block
       if (
         type != BlockType.EMPTY &&
-        this.attachedBlocks.get(offset.toString()).type == BlockType.EMPTY
+        this.getBlockAtOffset(offset.toString()).type == BlockType.EMPTY
       ) {
         this.removeBlock(offset.toString());
       } else {
@@ -450,7 +450,7 @@ export class Platform {
     if (hit.object == undefined) {
       return null;
     }
-    let hitBlock = this.attachedBlocks.get(
+    let hitBlock = this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     );
 
@@ -485,7 +485,7 @@ export class Platform {
     if (hit.object == undefined) {
       return null;
     }
-    let hitEmptyBlock = this.attachedBlocks.get(
+    let hitEmptyBlock = this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     );
     hitEmptyBlock.graphicsBundle.enabled = true;
@@ -528,7 +528,7 @@ export class Platform {
       return null;
     }
 
-    let type = this.attachedBlocks.get(
+    let type = this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     )!.type;
 
@@ -547,7 +547,7 @@ export class Platform {
     if (!this.attachedBlocks.has(key)) {
       return false;
     }
-    let block = this.attachedBlocks.get(key)!;
+    let block = this.getBlockAtOffset(key)!;
     if (block === this.baseBlock) {
       return false;
     }
@@ -564,7 +564,7 @@ export class Platform {
         if (neighbor.type !== BlockType.EMPTY) {
           continue;
         }
-        const neighborBlock = this.attachedBlocks.get(
+        const neighborBlock = this.getBlockAtOffset(
           this.physicsObjectIdToAttachedBlocksKey.get(
             neighbor.physicsObject.physicsObjectId
           )
@@ -591,13 +591,17 @@ export class Platform {
     return true;
   }
 
+  getBlockAtOffset(offset: string): Block | undefined {
+    return this.attachedBlocks.get(offset.toString());
+  }
+
   getNeighborBlocks(block: Block): Block[] {
     const neighbors: Block[] = [];
     const neighborPos = vec3.create();
 
     for (const offset of Platform.NEIGHBOR_OFFSETS) {
       vec3.add(neighborPos, block.graphicsBundle.transform.position, offset);
-      const neighbor = this.attachedBlocks.get(neighborPos.toString());
+      const neighbor = this.getBlockAtOffset(offset.toString());
       if (neighbor) {
         neighbors.push(neighbor);
       }
