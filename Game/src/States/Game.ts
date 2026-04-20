@@ -366,9 +366,10 @@ export default class Game {
         return true;
       }
       if (
-        this.player.physicsObject.collisionsLastUpdate.has(
-          block.physicsObject.physicsObjectId,
-        )
+        vec3.dist(
+          block.physicsObject.transform.position,
+          this.player.physicsObject.transform.position,
+        ) < 1.5
       ) {
         this.player.pickupBlock(block.type);
         this.scene.deleteGraphicsBundle(block.graphicsBundle);
