@@ -8,7 +8,7 @@ export default class EndScreen {
       src: ["Assets/Audio/723702__tomentum__hope-in-dark-places.wav"],
       autoplay: true,
       loop: true,
-      volume: 1.0,
+      volume: 0.5,
     });
 
     document.exitPointerLock();

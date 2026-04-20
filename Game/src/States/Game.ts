@@ -30,6 +30,7 @@ import {
   Platform,
 } from "../Platform.js";
 import GameGUI from "../GUI/GameGUI.js";
+import { Howl } from "howler";
 
 export default class Game {
   private renderer: Renderer3D;
@@ -41,6 +42,8 @@ export default class Game {
 
   player: Player;
   physicsScene: PhysicsScene;
+
+  ambient: Howl = null;
 
   private gameTimer = 0.0;
 
@@ -83,6 +86,12 @@ export default class Game {
     this.camera.setFOV(80);
 
     this.createLevel();
+    this.ambient = new Howl({
+      src: ["Assets/Audio/327586__kickhat__ambient.mp3"],
+      autoplay: true,
+      loop: true,
+      volume: 1.0,
+    });
   }
 
   createLevel() {
@@ -394,6 +403,12 @@ export default class Game {
     textEl.style.color = "rgb(80, 255, 120)";
     textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
 
+    new Howl({
+      src: ["Assets/Audio/58932__electrosnail__radio_noises.mp3"],
+      autoplay: true,
+      volume: 0.2,
+    });
+
     const fadeDiv = this.guiRenderer.getNewDiv();
     fadeDiv.ignoreEngineModifiers = true;
     const fadeEl = fadeDiv.getElement();
@@ -417,13 +432,22 @@ export default class Game {
 
     setTimeout(() => {
       text.textString = "Signal received.";
+      new Howl({
+        src: ["Assets/Audio/459838__eschwabe3__ship-radar.wav"],
+        autoplay: true,
+        volume: 0.5,
+      }).fade(0.5, 0, 3000);
     }, 3500);
 
     setTimeout(() => {
+      this.ambient.fade(1, 0, 3000);
+      setTimeout(() => {
+        this.ambient.unload();
+      }, 3000);
       el.remove();
       fadeEl.remove();
       this.isGameOver = true;
-    }, 5500);
+    }, 6500);
   }
 
   preRenderingUpdate(dt: number) {
