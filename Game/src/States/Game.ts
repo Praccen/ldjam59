@@ -494,7 +494,11 @@ export default class Game {
           vec4.set(shapeGb.colour, 1.0, 1.0, 1.0, 1.0);
           this.targetBlockShape = block.physicsObject.boundingBox;
         }
+      } else {
+        this.scene.deleteShape(this.targetBlockShape);
       }
+    } else {
+      this.scene.deleteShape(this.targetBlockShape);
     }
   }
 
