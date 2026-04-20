@@ -86,11 +86,8 @@ export default class Player {
       this.physicsObject.isImmovable = true;
     } else {
       this.physicsObject.isImmovable = false;
+      this.floating = true;
     }
-  }
-
-  setFloating() {
-    this.floating = true;
   }
 
   update(dt: number, camera: Camera, platform: Platform) {

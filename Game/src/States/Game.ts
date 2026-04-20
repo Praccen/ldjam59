@@ -280,8 +280,7 @@ export default class Game {
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50, 800.0);
           this.startingPlatform.splitPlatform(this.detachedBlocks, 400.0);
           this.crashHappened = true;
-          this.player.setFloating();
-          this.player.setConnectedBlock(null!);
+          this.player.setConnectedBlock(null!, false);
           vec3.set(this.player.physicsObject.impulse, -2.0, 0.0, 0.0);
 
           const antennaTargets: [Block | undefined, vec3][] = [
@@ -358,17 +357,11 @@ export default class Game {
       }
       if (vec3.sqrLen(block.getWorldPos()) > Math.pow(100, 2.0)) {
         // Make it move towards player
-        vec3.scale(
+        vec3.set(
           block.physicsObject.velocity,
-          vec3.normalize(
-            vec3.create(),
-            vec3.sub(
-              vec3.create(),
-              this.player.physicsObject.transform.position,
-              block.getWorldPos(),
-            ),
-          ),
-          Math.random() * 5.0,
+          Math.random() * 10.0 - 5,
+          Math.random() * 10.0 - 5,
+          Math.random() * 10.0 - 5,
         );
         return true;
       }
