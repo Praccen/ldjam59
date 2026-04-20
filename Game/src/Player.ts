@@ -13,7 +13,7 @@ import { Block, BlockType, Platform } from "./Platform";
 import GameGUI from "./GUI/GameGUI";
 import ActionBar from "./GUI/Inventory";
 
-const jumpForce: number = 1.5;
+const jumpForce: number = 6.0;
 const sensitivity: number = 0.4;
 
 export default class Player {

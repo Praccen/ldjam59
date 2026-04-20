@@ -284,9 +284,9 @@ export default class Game {
           vec3.set(this.player.physicsObject.impulse, -2.0, 0.0, 0.0);
 
           const antennaTargets: [Block | undefined, vec3][] = [
-            [antenna1, vec3.fromValues(3, 0, 0)],
-            [antenna2, vec3.fromValues(0, 3, 0)],
-            [antenna3, vec3.fromValues(0, 0, 3)],
+            [antenna1, vec3.fromValues(10, 0, 0)],
+            [antenna2, vec3.fromValues(0, 20, 0)],
+            [antenna3, vec3.fromValues(0, 0, 35)],
           ];
           for (const [block, target] of antennaTargets) {
             if (block == null) continue;
@@ -335,7 +335,7 @@ export default class Game {
         } else {
           vec3.copy(pos, state.target);
           state.arrived = true;
-          block.physicsObject.isImmovable = false;
+          block.physicsObject.isImmovable = true;
           this.antennaBlocks.delete(block);
         }
       }
@@ -357,11 +357,22 @@ export default class Game {
       }
       if (vec3.sqrLen(block.getWorldPos()) > Math.pow(100, 2.0)) {
         // Make it move towards player
-        vec3.set(
+        vec3.scale(
           block.physicsObject.velocity,
-          Math.random() * 10.0 - 5,
-          Math.random() * 10.0 - 5,
-          Math.random() * 10.0 - 5,
+          vec3.normalize(
+            vec3.create(),
+            vec3.sub(
+              vec3.create(),
+              this.player.physicsObject.transform.position,
+              block.getWorldPos(),
+            ),
+          ),
+          5.0 + Math.random() * 10.0,
+        );
+        vec3.add(
+          block.physicsObject.velocity,
+          block.physicsObject.velocity,
+          vec3.fromValues(Math.random(), Math.random(), Math.random()),
         );
         return true;
       }
@@ -520,9 +531,11 @@ export default class Game {
         }
       } else {
         this.scene.deleteShape(this.targetBlockShape);
+        this.targetBlockShape = null!;
       }
     } else {
       this.scene.deleteShape(this.targetBlockShape);
+      this.targetBlockShape = null!;
     }
   }
 
