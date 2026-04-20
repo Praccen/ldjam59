@@ -401,7 +401,7 @@ export class Platform {
     let hit = this.physicsScene.doRayCast(
       ray,
       false,
-      [player.physicsObject, player.connectedBlock.physicsObject].concat(
+      [player.physicsObject, player.connectedBlock?.physicsObject].concat(
         filtered
       ),
       100.0

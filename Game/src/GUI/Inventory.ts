@@ -10,6 +10,16 @@ interface ActionItem {
   amount: number;
 }
 
+const BlockTypeIcons: Record<BlockType, string> = {
+  [BlockType.ANTENNA1]: "Assets/Textures/icons/spaceantenna1.png",
+  [BlockType.ANTENNA2]: "Assets/Textures/icons/spaceantenna2.png",
+  [BlockType.ANTENNA3]: "Assets/Textures/icons/spaceantenna3.png",
+  [BlockType.BASE]: "Assets/Textures/icons/spacebox2.png",
+  [BlockType.EMPTY]: "Assets/Textures/Lava1.png",
+  [BlockType.FLOOR]: "Assets/Textures/icons/spacefloor.png",
+  [BlockType.SOLARPANEL]: "Assets/Textures/icons/spacesolar.png",
+};
+
 export default class ActionBar {
   private gui: GUIRenderer;
   private root: Div;
@@ -17,6 +27,7 @@ export default class ActionBar {
   private slots: (ActionItem | null)[] = new Array(10).fill(null);
   private slotDivs: Div[] = [];
   private slotTexts: TextObject2D[] = [];
+  private slotIcons: HTMLImageElement[] = [];
 
   private selectedIndex: number = 0;
 
@@ -53,13 +64,37 @@ export default class ActionBar {
       slotEl.style.justifyContent = "center";
       slotEl.style.position = "relative";
 
+      // --- SLOT NUMBER ---
+      const keyText = gui.getNew2DText(slot);
+      keyText.textString = i === 9 ? "0" : (i + 1).toString();
+      keyText.size = 12;
+      keyText.getElement().style.position = "absolute";
+      keyText.getElement().style.color = "rgb(53, 160, 214)";
+      keyText.getElement().style.top = "2px";
+      keyText.getElement().style.left = "4px";
+      keyText.getElement().style.opacity = "0.7";
+
+      // --- ICON ---
+      const img = document.createElement("img");
+      img.style.width = "80%";
+      img.style.height = "80%";
+      img.style.objectFit = "contain";
+      img.style.pointerEvents = "none"; // important so clicks pass through
+      slotEl.appendChild(img);
+
+      // --- AMOUNT TEXT ---
       const text = gui.getNew2DText(slot);
+      text.ignoreEngineModifiers = true;
       text.size = 14;
       text.scaleWithWindow = false;
       text.getElement().style.color = "rgb(255, 213, 0)";
+      text.getElement().style.position = "absolute";
+      text.getElement().style.bottom = "2px";
+      text.getElement().style.right = "4px";
 
       this.slotDivs.push(slot);
       this.slotTexts.push(text);
+      this.slotIcons.push(img);
     }
 
     this.updateUI();
@@ -123,16 +158,27 @@ export default class ActionBar {
     for (let i = 0; i < 10; i++) {
       const slot = this.slots[i];
       const el = this.slotDivs[i].getElement();
+      const icon = this.slotIcons[i];
 
       // Highlight selected
       el.style.border =
         i === this.selectedIndex ? "2px solid yellow" : "2px solid #555";
+      el.style.transform =
+        i === this.selectedIndex ? "scale(1.1)" : "scale(1.0)";
 
       if (slot) {
-        this.slotTexts[i].textString = `${BlockType[slot.type]}\n${
-          slot.amount
-        }`;
+        // Set icon
+        const iconPath = BlockTypeIcons[slot.type];
+        icon.src = iconPath ?? "";
+        icon.style.display = "block";
+
+        // Set amount text only
+        this.slotTexts[i].textString = `${slot.amount}`;
+        // this.slotTexts[i].textString = `${BlockType[slot.type]}\n${
+        //   slot.amount
+        // }`;
       } else {
+        icon.style.display = "none";
         this.slotTexts[i].textString = " ";
       }
     }

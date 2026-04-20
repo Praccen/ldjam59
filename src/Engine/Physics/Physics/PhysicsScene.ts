@@ -85,6 +85,7 @@ export default class PhysicsScene {
       if (
         ignoreObjectsList.find((value) => {
           return (
+            value &&
             value.physicsObjectId == treeContent.physicsObject.physicsObjectId
           );
         }) != undefined
