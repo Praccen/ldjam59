@@ -428,7 +428,7 @@ export class Platform {
   showRemovableBlock(camera: Camera, player: Player) {
     // Ignore  empty blocks
     const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type === BlockType.EMPTY)
+      .filter((block) => block != null && block.type == BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
     let ray = new Ray();
@@ -613,7 +613,7 @@ export class Platform {
 
     for (const offset of Platform.NEIGHBOR_OFFSETS) {
       vec3.add(neighborPos, block.graphicsBundle.transform.position, offset);
-      const neighbor = this.getBlockAtOffset(offset.toString());
+      const neighbor = this.getBlockAtOffset(neighborPos.toString());
       if (neighbor) {
         neighbors.push(neighbor);
       }
