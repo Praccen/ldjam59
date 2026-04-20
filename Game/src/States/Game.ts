@@ -284,6 +284,8 @@ export default class Game {
         } else {
           vec3.copy(pos, state.target);
           state.arrived = true;
+          block.physicsObject.isImmovable = false;
+          this.antennaBlocks.delete(block);
         }
       }
     }
