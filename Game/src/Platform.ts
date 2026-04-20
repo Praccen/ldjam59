@@ -453,17 +453,24 @@ export class Platform {
     let hitBlock = this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     );
+    if (hitBlock == undefined) {
+      return null;
+    }
 
-    hitBlock.graphicsBundle.diffuse =
-      this.scene.renderer.textureStore.getTexture("CSS:rgba(255, 0, 0, 0.25)");
-
-    // TODO do this in a better way?
-    setTimeout(() => {
+    if (hitBlock.graphicsBundle != null) {
       hitBlock.graphicsBundle.diffuse =
         this.scene.renderer.textureStore.getTexture(
-          BlockTypeToColorMap.get(hitBlock.type)!
+          "CSS:rgba(255, 0, 0, 0.25)"
         );
-    }, 500);
+
+      // TODO do this in a better way?
+      setTimeout(() => {
+        hitBlock.graphicsBundle.diffuse =
+          this.scene.renderer.textureStore.getTexture(
+            BlockTypeToColorMap.get(hitBlock.type)!
+          );
+      }, 500);
+    }
   }
 
   showEmptyBlock(camera: Camera, player: Player) {
@@ -488,12 +495,17 @@ export class Platform {
     let hitEmptyBlock = this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
     );
-    hitEmptyBlock.graphicsBundle.enabled = true;
+    if (hitEmptyBlock == undefined) {
+      return null;
+    }
+    if (hitEmptyBlock.graphicsBundle != null) {
+      hitEmptyBlock.graphicsBundle.enabled = true;
 
-    // TODO do this in a better way
-    setTimeout(() => {
-      hitEmptyBlock.graphicsBundle.enabled = false;
-    }, 500);
+      // TODO do this in a better way
+      setTimeout(() => {
+        hitEmptyBlock.graphicsBundle.enabled = false;
+      }, 500);
+    }
   }
 
   removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {
