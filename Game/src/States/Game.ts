@@ -439,31 +439,35 @@ export default class Game {
     fadeEl.style.opacity = "0";
 
     setTimeout(() => {
+      // Start fading after 2 sec
       fadeEl.style.animation = "fade-to-black 3s ease-in forwards";
-    }, 2000);
-    setTimeout(() => {
-      text.textString = "";
-      textEl.style.animation = "";
-    }, 2500);
-
-    setTimeout(() => {
-      text.textString = "Signal received.";
-      new Howl({
-        src: ["Assets/Audio/459838__eschwabe3__ship-radar.wav"],
-        autoplay: true,
-        volume: 0.001,
-      }).fade(0.5, 0, 3000);
-    }, 3500);
-
-    setTimeout(() => {
-      this.ambient.fade(1, 0, 3000);
       setTimeout(() => {
-        this.ambient.unload();
-      }, 3000);
-      el.remove();
-      fadeEl.remove();
-      this.isGameOver = true;
-    }, 6500);
+        // Unset text after 2.5 sec
+        text.textString = "";
+        textEl.style.animation = "";
+        setTimeout(() => {
+          // Set signal received and start signal sound aftar 3.5 sec
+          text.textString = "Signal received.";
+          new Howl({
+            src: ["Assets/Audio/459838__eschwabe3__ship-radar.wav"],
+            autoplay: true,
+            volume: 0.001,
+          }).fade(0.5, 0, 3000);
+          setTimeout(() => {
+            // Fade ambient after 6.5 sec
+            this.ambient.fade(1, 0, 3000);
+            setTimeout(() => {
+              // unload ambient after 9.5 sec
+              this.ambient.fade(1, 0, 3000);
+              this.ambient.unload();
+            }, 3000);
+            el.remove();
+            fadeEl.remove();
+            this.isGameOver = true;
+          }, 3000);
+        }, 1000);
+      }, 500);
+    }, 2000);
   }
 
   preRenderingUpdate(dt: number) {

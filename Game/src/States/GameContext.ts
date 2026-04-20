@@ -43,6 +43,7 @@ export default class GameContext {
   }
 
   onExit() {
+    this.breathing.unload();
     this.game.onExit();
   }
 

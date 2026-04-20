@@ -67,6 +67,7 @@ const maxUpdatesPerFrame = 20;
 function animate() {
   if (gameContext.game.isGameOver) {
     new EndScreen();
+    gameContext.onExit();
     return;
   }
   requestAnimationFrame(animate);
