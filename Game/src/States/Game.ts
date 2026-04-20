@@ -162,7 +162,7 @@ export default class Game {
     );
 
     this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(1000.0, 0.0, 0.0));
 
     let moodParticleSpawner = this.scene.addNewParticleSpawner(
       "CSS:rgb(200, 200, 200)",
@@ -278,7 +278,7 @@ export default class Game {
             volume: 0.5,
           });
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50, 800.0);
-          this.startingPlatform.splitPlatform(this.detachedBlocks, 400.0);
+          this.startingPlatform.splitPlatform(this.detachedBlocks, 50, 400.0);
           this.crashHappened = true;
           this.player.setConnectedBlock(null!, false);
           vec3.set(this.player.physicsObject.impulse, -2.0, 0.0, 0.0);
@@ -380,7 +380,7 @@ export default class Game {
         vec3.dist(
           block.physicsObject.transform.position,
           this.player.physicsObject.transform.position,
-        ) < 1.5
+        ) < 2.0
       ) {
         this.player.pickupBlock(block.type);
         this.scene.deleteGraphicsBundle(block.graphicsBundle);
