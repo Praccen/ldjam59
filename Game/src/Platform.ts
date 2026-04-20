@@ -302,8 +302,8 @@ export class Platform {
     if (this.attachedBlocks.has(offset.toString())) {
       // Replace if empty block
       if (
-        type != BlockType.EMPTY &&
-        this.getBlockAtOffset(offset.toString()).type == BlockType.EMPTY
+        type !== BlockType.EMPTY &&
+        this.getBlockAtOffset(offset.toString()).type === BlockType.EMPTY
       ) {
         this.removeBlock(offset.toString());
       } else {
@@ -312,7 +312,7 @@ export class Platform {
     }
 
     return new Promise<Block>(async (resolve, reject) => {
-      if (type != BlockType.EMPTY) {
+      if (type !== BlockType.EMPTY) {
         if (this.baseBlock == undefined) {
           type = BlockType.BASE;
           if (vec3.sqrLen(offset) > 0.0001) {
@@ -340,7 +340,7 @@ export class Platform {
           let physicsObject = this.physicsScene.addNewPhysicsObject(
             gb.transform
           );
-          if (type == BlockType.EMPTY) {
+          if (type === BlockType.EMPTY) {
             gb.enabled = false;
             physicsObject.isCollidable = false;
           }
@@ -357,7 +357,7 @@ export class Platform {
           );
           resolve(block);
         });
-      if (type != BlockType.EMPTY) {
+      if (type !== BlockType.EMPTY) {
         // Add empty blocks around this block
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(1, 0, 0)),
@@ -393,7 +393,7 @@ export class Platform {
     player: Player
   ): boolean {
     const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type != BlockType.EMPTY)
+      .filter((block) => block.type !== BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
     let ray = new Ray();
@@ -428,7 +428,7 @@ export class Platform {
   showRemovableBlock(camera: Camera, player: Player) {
     // Ignore  empty blocks
     const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type == BlockType.EMPTY)
+      .filter((block) => block.type === BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
     let ray = new Ray();
@@ -441,7 +441,7 @@ export class Platform {
 
     // Find out if tethered block only has one real neighbor, if so do not remove it
     const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type != BlockType.EMPTY
+      (block) => block.type !== BlockType.EMPTY
     );
     if (neighbors.length == 1) {
       ignoredObjects.push(neighbors.at(0).physicsObject);
@@ -476,7 +476,7 @@ export class Platform {
   showEmptyBlock(camera: Camera, player: Player) {
     // Ignore none empty blocks
     const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type != BlockType.EMPTY)
+      .filter((block) => block.type !== BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
     let ray = new Ray();
@@ -511,7 +511,7 @@ export class Platform {
   removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {
     // Ignore empty blocks
     const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type == BlockType.EMPTY)
+      .filter((block) => block.type === BlockType.EMPTY)
       .map((block) => block.physicsObject);
 
     let ray = new Ray();
@@ -524,7 +524,7 @@ export class Platform {
 
     // Find out if tethered block only has one real neighbor, if so do not remove it
     const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type != BlockType.EMPTY
+      (block) => block.type !== BlockType.EMPTY
     );
     if (neighbors.length == 1) {
       ignoredObjects.push(neighbors.at(0).physicsObject);
@@ -628,7 +628,7 @@ export class Platform {
         continue;
       }
 
-      if (block[1].type == BlockType.EMPTY) {
+      if (block[1].type === BlockType.EMPTY) {
         this.physicsScene.removePhysicsObject(block[1].physicsObject);
         this.scene.deleteGraphicsBundle(block[1].graphicsBundle);
         continue;
