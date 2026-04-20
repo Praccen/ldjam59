@@ -3,6 +3,7 @@ import {
   Frustum,
   GraphicsBundle,
   GUIRenderer,
+  ParticleSpawner,
   PhysicsObject,
   PhysicsScene,
   quat,
@@ -131,6 +132,39 @@ export default class Game {
 
     this.debrisPlatform = new Platform(this.scene, this.physicsScene);
     createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+
+    let moodParticleSpawner = this.scene.addNewParticleSpawner(
+      "CSS:rgb(200, 200, 200)",
+      2000
+    );
+    moodParticleSpawner.lifeTime = 1.0;
+    moodParticleSpawner.randomSizeModifier.sizeMin = 0.1;
+    moodParticleSpawner.randomSizeModifier.sizeMax = 0.25;
+    moodParticleSpawner.sizeChangePerSecond = 0.0;
+    vec3.set(
+      moodParticleSpawner.randomPositionModifier.boxMin,
+      -100.0,
+      -100.0,
+      -100.0
+    );
+    vec3.set(
+      moodParticleSpawner.randomPositionModifier.boxMax,
+      300.0,
+      100.0,
+      100.0
+    );
+    vec3.set(
+      moodParticleSpawner.randomStartVelModifier.direction,
+      0.0,
+      -0.5,
+      -0.5
+    );
+    moodParticleSpawner.randomStartVelModifier.degreesMax = 0.0;
+    moodParticleSpawner.randomStartVelModifier.degreesMin = 0.0;
+    moodParticleSpawner.randomStartVelModifier.amplitudeMin = 180.0;
+    moodParticleSpawner.randomStartVelModifier.amplitudeMax = 350.0;
+
+    moodParticleSpawner.initAllParticles();
   }
 
   resize(width: number, height: number) {
@@ -243,6 +277,7 @@ export default class Game {
         vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position)
       );
     }
+    this.scene.updateParticleSpawners(dt);
   }
 
   draw() {
