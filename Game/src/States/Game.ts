@@ -173,7 +173,7 @@ export default class Game {
     moodParticleSpawner.randomStartVelModifier.amplitudeMin = 180.0;
     moodParticleSpawner.randomStartVelModifier.amplitudeMax = 350.0;
 
-    moodParticleSpawner.initAllParticles();
+    // moodParticleSpawner.initAllParticles();
   }
 
   resize(width: number, height: number) {
