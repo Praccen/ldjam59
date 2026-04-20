@@ -160,8 +160,8 @@ export default class Game {
       this.player,
     );
 
-    // this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    // createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+    this.debrisPlatform = new Platform(this.scene, this.physicsScene);
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
 
     let moodParticleSpawner = this.scene.addNewParticleSpawner(
       "CSS:rgb(200, 200, 200)",
@@ -252,8 +252,14 @@ export default class Game {
         );
 
         if (
-          this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
+          this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 3
         ) {
+          vec3.scale(
+            this.debrisPlatform.baseBlock.physicsObject.velocity,
+            this.debrisPlatform.baseBlock.physicsObject.velocity,
+            0.4,
+          );
+
           const antenna1 = this.startingPlatform.getBlockAtOffset(
             vec3.fromValues(0, 5, 0).toString(),
           );
@@ -264,9 +270,12 @@ export default class Game {
             vec3.fromValues(0, 7, 0).toString(),
           );
 
-          this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
-          this.startingPlatform.splitPlatform(this.detachedBlocks, 130);
+          this.debrisPlatform.splitPlatform(this.detachedBlocks, 50, 800.0);
+          this.startingPlatform.splitPlatform(this.detachedBlocks, 400.0);
           this.crashHappened = true;
+          this.player.setFloating();
+          this.player.setConnectedBlock(null!);
+          vec3.set(this.player.physicsObject.impulse, -2.0, 0.0, 0.0);
 
           const antennaTargets: [Block | undefined, vec3][] = [
             [antenna1, vec3.fromValues(3, 0, 0)],
@@ -284,15 +293,10 @@ export default class Game {
             });
           }
 
-          if (
-            this.player.connectedBlock != null ||
-            this.player.tetheredBlock != null
-          ) {
-            this.startingPlatform.resetWithNewBaseBlock(
-              this.player,
-              this.detachedBlocks,
-            );
-          }
+          this.startingPlatform.resetWithNewBaseBlock(
+            this.player,
+            this.detachedBlocks,
+          );
         }
       }
     }
@@ -345,10 +349,21 @@ export default class Game {
       if (this.antennaBlocks.has(block)) {
         return true;
       }
-      if (vec3.sqrLen(block.getWorldPos()) > Math.pow(400, 2.0)) {
-        this.scene.deleteGraphicsBundle(block.graphicsBundle);
-        this.physicsScene.removePhysicsObject(block.physicsObject);
-        return false;
+      if (vec3.sqrLen(block.getWorldPos()) > Math.pow(100, 2.0)) {
+        // Make it move towards player
+        vec3.scale(
+          block.physicsObject.velocity,
+          vec3.normalize(
+            vec3.create(),
+            vec3.sub(
+              vec3.create(),
+              this.player.physicsObject.transform.position,
+              block.getWorldPos(),
+            ),
+          ),
+          Math.random() * 5.0,
+        );
+        return true;
       }
       if (
         this.player.physicsObject.collisionsLastUpdate.has(
@@ -463,7 +478,7 @@ export default class Game {
     let hit = this.physicsScene.doRayCast(
       ray,
       false,
-      [this.player.physicsObject, this.player.connectedBlock.physicsObject],
+      [this.player.physicsObject, this.player.connectedBlock?.physicsObject],
       10.0,
     );
 

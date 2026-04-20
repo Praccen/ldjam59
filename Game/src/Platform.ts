@@ -44,7 +44,7 @@ const BlockTypeToMeshMap = new Map<BlockType, string>([
 export function createStartingShip(
   platform: Platform,
   baseBlockStartingPosition: vec3,
-  player?: Player
+  player?: Player,
 ) {
   platform
     .addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE)
@@ -131,7 +131,7 @@ export function createStartingShip(
 
 export function createDebrisShip(
   platform: Platform,
-  baseBlockStartingPosition: vec3
+  baseBlockStartingPosition: vec3,
 ) {
   platform
     .addBlock(vec3.fromValues(0, 0, 0), BlockType.BASE)
@@ -195,7 +195,7 @@ export class Block {
   constructor(
     graphicsBundle: GraphicsBundle,
     physicsObject: PhysicsObject,
-    type: BlockType
+    type: BlockType,
   ) {
     this.graphicsBundle = graphicsBundle;
     this.physicsObject = physicsObject;
@@ -206,13 +206,13 @@ export class Block {
     return vec3.transformMat4(
       vec3.create(),
       vec3.create(),
-      this.graphicsBundle.transform.matrix
+      this.graphicsBundle.transform.matrix,
     );
   }
   getWorldRot(): quat {
     return mat4.getRotation(
       quat.create(),
-      this.graphicsBundle.transform.matrix
+      this.graphicsBundle.transform.matrix,
     );
   }
 }
@@ -252,7 +252,7 @@ export class Platform {
     for (const block of detachedBlocks) {
       const sqrDist = vec3.sqrDist(
         block.getWorldPos(),
-        player.physicsObject.transform.position
+        player.physicsObject.transform.position,
       );
       if (sqrDist < closest) {
         closest = sqrDist;
@@ -270,13 +270,16 @@ export class Platform {
     this.attachedBlocks.set(vec3.create().toString(), this.baseBlock);
     this.physicsObjectIdToAttachedBlocksKey.set(
       activeBlock.physicsObject.physicsObjectId,
-      vec3.create().toString()
+      vec3.create().toString(),
     );
 
     // Add empty blocks around this block
     this.addBlock(vec3.fromValues(1, 0, 0), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.EMPTY);
-    this.addBlock(vec3.fromValues(0, 1, 0), BlockType.EMPTY);
+    this.addBlock(vec3.fromValues(0, 1, 0), BlockType.EMPTY).then((block) => {
+      player.setTetheredBlock(block);
+      vec3.set(player.physicsObject.impulse, -5.0, 0.0, 0.0);
+    });
     this.addBlock(vec3.fromValues(0, -1, 0), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(0, 0, 1), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(0, 0, -1), BlockType.EMPTY);
@@ -285,7 +288,7 @@ export class Platform {
   getBlockFromPhysicsObject(physicsObject: PhysicsObject): Block | undefined {
     if (
       !this.physicsObjectIdToAttachedBlocksKey.has(
-        physicsObject.physicsObjectId
+        physicsObject.physicsObjectId,
       )
     ) {
       return undefined;
@@ -293,8 +296,8 @@ export class Platform {
 
     return this.getBlockAtOffset(
       this.physicsObjectIdToAttachedBlocksKey.get(
-        physicsObject.physicsObjectId
-      ) ?? ""
+        physicsObject.physicsObjectId,
+      ) ?? "",
     );
   }
 
@@ -326,11 +329,11 @@ export class Platform {
         .addNewMesh(
           BlockTypeToMeshMap.get(type)!,
           BlockTypeToColorMap.get(type)!,
-          "CSS:rgb(0,0,0)"
+          "CSS:rgb(0,0,0)",
         )
         .then((gb) => {
           gb.emission = this.scene.renderer.textureStore.getTexture(
-            "Assets/Textures/emissionpalette.png"
+            "Assets/Textures/emissionpalette.png",
           );
           gb.transform.position = offset;
           if (this.baseBlock != undefined) {
@@ -338,7 +341,7 @@ export class Platform {
               this.baseBlock.graphicsBundle.transform;
           }
           let physicsObject = this.physicsScene.addNewPhysicsObject(
-            gb.transform
+            gb.transform,
           );
           if (type === BlockType.EMPTY) {
             gb.enabled = false;
@@ -353,7 +356,7 @@ export class Platform {
           this.attachedBlocks.set(offset.toString(), block);
           this.physicsObjectIdToAttachedBlocksKey.set(
             physicsObject.physicsObjectId,
-            offset.toString()
+            offset.toString(),
           );
           resolve(block);
         });
@@ -361,27 +364,27 @@ export class Platform {
         // Add empty blocks around this block
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(1, 0, 0)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(-1, 0, 0)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(0, 1, 0)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(0, -1, 0)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(0, 0, 1)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
         this.addBlock(
           vec3.add(vec3.create(), offset, vec3.fromValues(0, 0, -1)),
-          BlockType.EMPTY
+          BlockType.EMPTY,
         );
       }
     });
@@ -390,7 +393,7 @@ export class Platform {
   placeBlockFromRayCast(
     type: BlockType,
     camera: Camera,
-    player: Player
+    player: Player,
   ): boolean {
     const filtered = [...this.attachedBlocks.values()]
       .filter((block) => block.type !== BlockType.EMPTY)
@@ -402,9 +405,9 @@ export class Platform {
       ray,
       false,
       [player.physicsObject, player.connectedBlock?.physicsObject].concat(
-        filtered
+        filtered,
       ),
-      100.0
+      100.0,
     );
     if (hit.object == undefined) {
       return false;
@@ -417,7 +420,7 @@ export class Platform {
     }
 
     const key = this.physicsObjectIdToAttachedBlocksKey.get(
-      hit.object.physicsObjectId
+      hit.object.physicsObjectId,
     );
     const [x, y, z] = key.split(",").map(Number);
     const offset = vec3.fromValues(x, y, z);
@@ -441,7 +444,7 @@ export class Platform {
 
     // Find out if tethered block only has one real neighbor, if so do not remove it
     const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type !== BlockType.EMPTY
+      (block) => block.type !== BlockType.EMPTY,
     );
     if (neighbors.length == 1) {
       ignoredObjects.push(neighbors.at(0).physicsObject);
@@ -451,7 +454,7 @@ export class Platform {
       return null;
     }
     let hitBlock = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
     );
     if (hitBlock == undefined) {
       return null;
@@ -460,14 +463,14 @@ export class Platform {
     if (hitBlock.graphicsBundle != null) {
       hitBlock.graphicsBundle.diffuse =
         this.scene.renderer.textureStore.getTexture(
-          "CSS:rgba(255, 0, 0, 0.25)"
+          "CSS:rgba(255, 0, 0, 0.25)",
         );
 
       // TODO do this in a better way?
       setTimeout(() => {
         hitBlock.graphicsBundle.diffuse =
           this.scene.renderer.textureStore.getTexture(
-            BlockTypeToColorMap.get(hitBlock.type)!
+            BlockTypeToColorMap.get(hitBlock.type)!,
           );
       }, 500);
     }
@@ -485,15 +488,15 @@ export class Platform {
       ray,
       false,
       [player.physicsObject, player.connectedBlock.physicsObject].concat(
-        filtered
+        filtered,
       ),
-      2.0
+      2.0,
     );
     if (hit.object == undefined) {
       return null;
     }
     let hitEmptyBlock = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
     );
     if (hitEmptyBlock == undefined) {
       return null;
@@ -524,7 +527,7 @@ export class Platform {
 
     // Find out if tethered block only has one real neighbor, if so do not remove it
     const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type !== BlockType.EMPTY
+      (block) => block.type !== BlockType.EMPTY,
     );
     if (neighbors.length == 1) {
       ignoredObjects.push(neighbors.at(0).physicsObject);
@@ -541,12 +544,14 @@ export class Platform {
     }
 
     let type = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
     )!.type;
 
     if (
       this.removeBlock(
-        this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!
+        this.physicsObjectIdToAttachedBlocksKey.get(
+          hit.object.physicsObjectId,
+        )!,
       )
     ) {
       return type;
@@ -564,7 +569,7 @@ export class Platform {
       return false;
     }
     this.physicsObjectIdToAttachedBlocksKey.delete(
-      block.physicsObject.physicsObjectId
+      block.physicsObject.physicsObjectId,
     );
     this.physicsScene.removePhysicsObject(block.physicsObject);
     this.scene.deleteGraphicsBundle(block.graphicsBundle);
@@ -578,17 +583,17 @@ export class Platform {
         }
         const neighborBlock = this.getBlockAtOffset(
           this.physicsObjectIdToAttachedBlocksKey.get(
-            neighbor.physicsObject.physicsObjectId
-          )
+            neighbor.physicsObject.physicsObjectId,
+          ),
         );
         const hasRealNeighbor = this.getNeighborBlocks(neighborBlock).some(
-          (block) => block.type !== BlockType.EMPTY
+          (block) => block.type !== BlockType.EMPTY,
         );
         if (!hasRealNeighbor) {
           this.removeBlock(
             this.physicsObjectIdToAttachedBlocksKey.get(
-              neighbor.physicsObject.physicsObjectId
-            )
+              neighbor.physicsObject.physicsObjectId,
+            ),
           );
         }
       }
@@ -635,7 +640,11 @@ export class Platform {
     return has1 && has2 && has3;
   }
 
-  splitPlatform(detachedBlocks: Block[], pieceMass: number = 1.0) {
+  splitPlatform(
+    detachedBlocks: Block[],
+    pieceMass: number = 1.0,
+    explosionAmplitude: number = 100.0,
+  ) {
     for (let block of this.attachedBlocks) {
       if (block[1] == undefined) {
         continue;
@@ -650,16 +659,16 @@ export class Platform {
       block[1]!.graphicsBundle.transform.position = vec3.transformMat4(
         vec3.create(),
         vec3.create(),
-        block[1].graphicsBundle.transform.matrix
+        block[1].graphicsBundle.transform.matrix,
       );
 
       block[1]!.graphicsBundle.transform.rotation = mat4.getRotation(
         quat.create(),
-        block[1]!.graphicsBundle.transform.matrix
+        block[1]!.graphicsBundle.transform.matrix,
       );
       block[1]!.graphicsBundle.transform.parentTransform = null!;
 
-      block[1]!.physicsObject.isImmovable = false;
+      block[1]!.physicsObject.isImmovable = true;
       block[1]!.physicsObject.mass = pieceMass;
       block[1]!.physicsObject.internalTree = null!;
 
@@ -667,17 +676,17 @@ export class Platform {
         block[1]!.physicsObject.momentum,
         Math.random() * 20.0,
         Math.random() * 20.0,
-        Math.random() * 20.0
+        Math.random() * 20.0,
       );
 
       vec3.copy(
         block[1]!.physicsObject.velocity,
-        this.baseBlock.physicsObject.velocity
+        this.baseBlock.physicsObject.velocity,
       );
       vec3.scale(
         block[1]!.physicsObject.impulse,
         vec3.fromValues(Math.random(), Math.random(), Math.random()),
-        Math.random() * 25.0
+        Math.random() * 800.0,
       );
       detachedBlocks.push(block[1]!);
     }

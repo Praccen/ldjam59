@@ -50,7 +50,7 @@ export default class Player {
     scene: Scene,
     physicsScene: PhysicsScene,
     guiRenderer: GUIRenderer,
-    gameGUI: GameGUI
+    gameGUI: GameGUI,
   ) {
     this.guiRenderer = guiRenderer;
     this.gameGUI = gameGUI;
@@ -65,7 +65,7 @@ export default class Player {
 
     this.tetherParticleSpawner = scene.addNewParticleSpawner(
       "CSS:rgba(255, 255, 215, 0.77)",
-      300
+      300,
     );
     this.tetherParticleSpawner.lifeTime = 0.01;
     this.tetherParticleSpawner.randomSizeModifier.sizeMin = 0.01;
@@ -87,6 +87,10 @@ export default class Player {
     } else {
       this.physicsObject.isImmovable = false;
     }
+  }
+
+  setFloating() {
+    this.floating = true;
   }
 
   update(dt: number, camera: Camera, platform: Platform) {
@@ -113,13 +117,13 @@ export default class Player {
       let tetherStart = vec3.sub(
         vec3.create(),
         this.physicsObject.transform.position,
-        camera.getUp()
+        camera.getUp(),
       );
 
       let direction = vec3.sub(
         vec3.create(),
         this.tetheredBlock.getWorldPos(),
-        tetherStart
+        tetherStart,
       );
 
       const numKeyframes = 10;
@@ -134,8 +138,8 @@ export default class Player {
               vec3.create(),
               tetherStart,
               direction,
-              i * (1.0 / (numKeyframes - 1))
-            )
+              i * (1.0 / (numKeyframes - 1)),
+            ),
           );
         }
       } else {
@@ -146,14 +150,14 @@ export default class Player {
             vec3.create(),
             tetherStart,
             direction,
-            i * (1.0 / (numKeyframes - 1))
+            i * (1.0 / (numKeyframes - 1)),
           );
 
           // Get the difference
           let diff = vec3.sub(
             vec3.create(),
             targetFrame,
-            this.tetherParticleSpawner.randomPositionModifier.keyframes[i]
+            this.tetherParticleSpawner.randomPositionModifier.keyframes[i],
           );
 
           // Apply more of the diff close to player and block, less in the middle of the line
@@ -165,8 +169,8 @@ export default class Player {
               vec3.squaredLength(diff) *
                 Math.max(0.1, Math.abs(i - numKeyframes / 2) / numKeyframes) +
                 this.tetherTension,
-              1.0
-            )
+              1.0,
+            ),
           );
         }
       }
@@ -182,7 +186,7 @@ export default class Player {
           this.physicsObject.transform.position,
           this.physicsObject.transform.position,
           targetPos,
-          t
+          t,
         );
       } else {
         this.physicsObject.transform.position = targetPos;
@@ -199,7 +203,7 @@ export default class Player {
       const blockPos = this.tetheredBlock.getWorldPos();
       const dist = vec3.distance(
         this.physicsObject.transform.position,
-        blockPos
+        blockPos,
       );
       if (dist >= this.tetherLength) {
         vec3.scaleAndAdd(
@@ -210,10 +214,10 @@ export default class Player {
             vec3.sub(
               vec3.create(),
               this.physicsObject.transform.position,
-              this.tetheredBlock.getWorldPos()
-            )
+              this.tetheredBlock.getWorldPos(),
+            ),
           ),
-          -0.001 * Math.pow(dist, 2)
+          -0.001 * Math.pow(dist, 2),
         );
         this.tetherTension = 0.001 * Math.pow(dist, 2);
       }
@@ -228,10 +232,10 @@ export default class Player {
     vec3.transformQuat(
       camOffset,
       camOffset,
-      this.physicsObject.transform.rotation
+      this.physicsObject.transform.rotation,
     );
     camera.setPosition(
-      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
+      vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset),
     );
 
     camera.setPitchJawDegrees(this.pitch, this.jaw);
@@ -280,13 +284,13 @@ export default class Player {
           this.physicsObject.transform.position,
           this.physicsObject.transform.position,
           jumpDir,
-          this.camOffset
+          this.camOffset,
         );
         vec3.scaleAndAdd(
           this.physicsObject.impulse,
           this.physicsObject.impulse,
           jumpDir,
-          jumpForce
+          jumpForce,
         );
       } else if (this.tetheredBlock != null) {
         this.tetherTension = 0.1;
@@ -298,10 +302,10 @@ export default class Player {
             vec3.sub(
               vec3.create(),
               this.physicsObject.transform.position,
-              this.tetheredBlock.getWorldPos()
-            )
+              this.tetheredBlock.getWorldPos(),
+            ),
           ),
-          -0.1
+          -0.1,
         );
       }
       this.jumping = true;
