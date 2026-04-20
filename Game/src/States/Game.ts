@@ -57,6 +57,7 @@ export default class Game {
 
   private crashHappened = false;
   private winTriggered = false;
+  isGameOver = false;
 
   constructor(
     renderer: Renderer3D,
@@ -393,19 +394,20 @@ export default class Game {
     textEl.style.color = "rgb(80, 255, 120)";
     textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
 
+    const fadeDiv = this.guiRenderer.getNewDiv();
+    fadeDiv.ignoreEngineModifiers = true;
+    const fadeEl = fadeDiv.getElement();
+    fadeEl.style.width = "100%";
+    fadeEl.style.height = "100%";
+    fadeEl.style.position = "fixed";
+    fadeEl.style.top = "0";
+    fadeEl.style.left = "0";
+    fadeEl.style.backgroundColor = "black";
+    fadeEl.style.pointerEvents = "none";
+    fadeEl.style.zIndex = "1000";
+    fadeEl.style.opacity = "0";
+
     setTimeout(() => {
-      const fadeDiv = this.guiRenderer.getNewDiv();
-      fadeDiv.ignoreEngineModifiers = true;
-      const fadeEl = fadeDiv.getElement();
-      fadeEl.style.width = "100%";
-      fadeEl.style.height = "100%";
-      fadeEl.style.position = "fixed";
-      fadeEl.style.top = "0";
-      fadeEl.style.left = "0";
-      fadeEl.style.backgroundColor = "black";
-      fadeEl.style.pointerEvents = "none";
-      fadeEl.style.zIndex = "1000";
-      fadeEl.style.opacity = "0";
       fadeEl.style.animation = "fade-to-black 3s ease-in forwards";
     }, 2000);
     setTimeout(() => {
@@ -416,6 +418,12 @@ export default class Game {
     setTimeout(() => {
       text.textString = "Signal received.";
     }, 3500);
+
+    setTimeout(() => {
+      el.remove();
+      fadeEl.remove();
+      this.isGameOver = true;
+    }, 5500);
   }
 
   preRenderingUpdate(dt: number) {

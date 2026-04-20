@@ -551,6 +551,13 @@ canvas {
   animation: staticFlicker 0.08s steps(8) infinite;
 }
 
+/* ── End screen ── */
+
+.signal-indicator--green {
+  background: rgba(80, 220, 130, 1) !important;
+  box-shadow: 0 0 6px rgba(80, 220, 130, 1) !important;
+}
+
 @keyframes staticFlicker {
   0% {
     transform: translate(0, 0);

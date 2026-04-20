@@ -1,5 +1,6 @@
 import GameContext from "./States/GameContext.js";
 import SplashScreen from "./States/SplashScreen.js";
+import EndScreen from "./States/EndScreen.js";
 
 window.addEventListener("contextmenu", function (e: Event) {
   e.preventDefault();
@@ -63,6 +64,10 @@ const maxUpdatesPerFrame = 20;
  * Animation function that takes care of requesting animation frames, calculating frame time and calls both update and render functions.
  */
 function animate() {
+  if (gameContext.game.isGameOver) {
+    new EndScreen();
+    return;
+  }
   requestAnimationFrame(animate);
   let now = Date.now();
   let dt = (now - lastUpdateTime) * 0.001;
