@@ -425,6 +425,7 @@ export class Platform {
     const [x, y, z] = key.split(",").map(Number);
     const offset = vec3.fromValues(x, y, z);
     this.addBlock(offset, type);
+
     return true;
   }
 
@@ -628,16 +629,29 @@ export class Platform {
   }
 
   hasAntennaComplete(): boolean {
-    let has1 = false,
-      has2 = false,
-      has3 = false;
+    const antenna1Blocks: Block[] = [];
+    const antenna2Blocks: Block[] = [];
+    const antenna3Blocks: Block[] = [];
     for (const block of this.attachedBlocks.values()) {
       if (!block) continue;
-      if (block.type === BlockType.ANTENNA1) has1 = true;
-      if (block.type === BlockType.ANTENNA2) has2 = true;
-      if (block.type === BlockType.ANTENNA3) has3 = true;
+      if (block.type === BlockType.ANTENNA1) antenna1Blocks.push(block);
+      if (block.type === BlockType.ANTENNA2) antenna2Blocks.push(block);
+      if (block.type === BlockType.ANTENNA3) antenna3Blocks.push(block);
     }
-    return has1 && has2 && has3;
+
+    // Check for a valid chain
+    for (const a1 of antenna1Blocks) {
+      const a1Neighbors = this.getNeighborBlocks(a1);
+      for (const a2 of antenna2Blocks) {
+        if (!a1Neighbors.includes(a2)) continue;
+        const a2Neighbors = this.getNeighborBlocks(a2);
+        for (const a3 of antenna3Blocks) {
+          if (a2Neighbors.includes(a3)) return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   splitPlatform(
