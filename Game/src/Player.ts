@@ -108,10 +108,16 @@ export default class Player {
     this.inventory.update();
 
     if (this.tetheredBlock != null) {
+      let tetherStart = vec3.sub(
+        vec3.create(),
+        this.physicsObject.transform.position,
+        camera.getUp()
+      );
+
       let direction = vec3.sub(
         vec3.create(),
         this.tetheredBlock.getWorldPos(),
-        this.physicsObject.transform.position
+        tetherStart
       );
 
       const numKeyframes = 10;
@@ -124,7 +130,7 @@ export default class Player {
           this.tetherParticleSpawner.randomPositionModifier.keyframes.push(
             vec3.scaleAndAdd(
               vec3.create(),
-              this.physicsObject.transform.position,
+              tetherStart,
               direction,
               i * (1.0 / (numKeyframes - 1))
             )
@@ -136,7 +142,7 @@ export default class Player {
           // Figure out the target frame position
           let targetFrame = vec3.scaleAndAdd(
             vec3.create(),
-            this.physicsObject.transform.position,
+            tetherStart,
             direction,
             i * (1.0 / (numKeyframes - 1))
           );
