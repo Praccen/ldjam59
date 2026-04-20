@@ -2,9 +2,11 @@ import { vec3 } from "gl-matrix";
 import {
   Camera,
   GUIRenderer,
+  ParticleSpawner,
   PhysicsObject,
   PhysicsScene,
   Ray,
+  Scene,
 } from "praccen-web-engine";
 import { Input } from "./Input";
 import { Block, BlockType, Platform } from "./Platform";
@@ -39,7 +41,11 @@ export default class Player {
 
   private inventory: ActionBar;
 
+  private tetherParticleSpawner: ParticleSpawner;
+  private tetherTension: number = 0.0;
+
   constructor(
+    scene: Scene,
     physicsScene: PhysicsScene,
     guiRenderer: GUIRenderer,
     gameGUI: GameGUI
@@ -54,6 +60,14 @@ export default class Player {
     this.physicsObject.drag = 0.0;
 
     this.inventory = new ActionBar(this.guiRenderer, this.gameGUI);
+
+    this.tetherParticleSpawner = scene.addNewParticleSpawner(
+      "CSS:rgba(255, 255, 215, 0.77)",
+      1000
+    );
+    this.tetherParticleSpawner.lifeTime = 0.01;
+    this.tetherParticleSpawner.randomSizeModifier.sizeMin = 0.01;
+    this.tetherParticleSpawner.randomSizeModifier.sizeMax = 0.01;
   }
 
   setTetheredBlock(block: Block) {
@@ -74,6 +88,7 @@ export default class Player {
   }
 
   update(dt: number, camera: Camera, platform: Platform) {
+    this.tetherTension = 0.0;
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
     if (document.pointerLockElement == document.body) {
@@ -91,6 +106,63 @@ export default class Player {
     this.updateCamera(camera);
 
     this.inventory.update();
+
+    if (this.tetheredBlock != null) {
+      let direction = vec3.sub(
+        vec3.create(),
+        this.tetheredBlock.getWorldPos(),
+        this.physicsObject.transform.position
+      );
+
+      const numKeyframes = 10;
+
+      if (
+        this.tetherParticleSpawner.randomPositionModifier.keyframes.length == 0
+      ) {
+        // Generate initial keyframes
+        for (let i = 0; i < numKeyframes; i++) {
+          this.tetherParticleSpawner.randomPositionModifier.keyframes.push(
+            vec3.scaleAndAdd(
+              vec3.create(),
+              this.physicsObject.transform.position,
+              direction,
+              i * (1.0 / (numKeyframes - 1))
+            )
+          );
+        }
+      } else {
+        // Update the existing keyframes
+        for (let i = 0; i < numKeyframes; i++) {
+          // Figure out the target frame position
+          let targetFrame = vec3.scaleAndAdd(
+            vec3.create(),
+            this.physicsObject.transform.position,
+            direction,
+            i * (1.0 / (numKeyframes - 1))
+          );
+
+          // Get the difference
+          let diff = vec3.sub(
+            vec3.create(),
+            targetFrame,
+            this.tetherParticleSpawner.randomPositionModifier.keyframes[i]
+          );
+
+          // Apply more of the diff close to player and block, less in the middle of the line
+          vec3.scaleAndAdd(
+            this.tetherParticleSpawner.randomPositionModifier.keyframes[i],
+            this.tetherParticleSpawner.randomPositionModifier.keyframes[i],
+            diff,
+            Math.min(
+              vec3.squaredLength(diff) *
+                Math.max(0.1, Math.abs(i - numKeyframes / 2) / numKeyframes) +
+                this.tetherTension,
+              1.0
+            )
+          );
+        }
+      }
+    }
   }
 
   setPositionFromBlock(dt: number) {
@@ -135,6 +207,7 @@ export default class Player {
           ),
           -0.001 * Math.pow(dist, 2)
         );
+        this.tetherTension = 0.001 * Math.pow(dist, 2);
       }
     }
   }
@@ -208,6 +281,7 @@ export default class Player {
           jumpForce
         );
       } else if (this.tetheredBlock != null) {
+        this.tetherTension = 0.1;
         vec3.scaleAndAdd(
           this.physicsObject.impulse,
           this.physicsObject.impulse,

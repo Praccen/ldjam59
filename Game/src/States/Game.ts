@@ -79,11 +79,17 @@ export default class Game {
 
     this.physicsScene = new PhysicsScene();
     vec3.zero(this.physicsScene.gravity);
-    this.player = new Player(this.physicsScene, this.guiRenderer, this.gameGUI);
+    this.player = new Player(
+      this.scene,
+      this.physicsScene,
+      this.guiRenderer,
+      this.gameGUI
+    );
 
     vec3.set(this.scene.getDirectionalLight().colour, 1.0, 1.0, 0.5);
     vec3.set(this.scene.getDirectionalLight().direction, 0.0, -1.0, 0.00000001);
     vec3.set(this.scene.getDirectionalLight().shadowFocusPos, 0.0, 0.0, 0.0);
+    this.scene.getDirectionalLight().ambientMultiplier = 0.3;
     this.scene.getDirectionalLight().shadowCameraDistance = 1000.0;
     this.scene.getDirectionalLight().lightProjectionBoxSideLength = 100.0;
 

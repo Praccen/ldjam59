@@ -128,7 +128,7 @@ export default class ParticleSpawner extends GraphicsObject {
   fadePerSecond: number = 0.0;
   fadePerSecondSquared: number = 0.0;
   textureChangePerSecond: number = 0.0;
-  sizeChangePerSecond: number = 1.0;
+  sizeChangePerSecond: number = 0.0;
   lifeTime: number = 1.0;
   position: vec3 = vec3.create();
   offset: vec3 = vec3.create();
