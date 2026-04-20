@@ -1,6 +1,7 @@
 import GameContext from "./States/GameContext.js";
 import SplashScreen from "./States/SplashScreen.js";
 import EndScreen from "./States/EndScreen.js";
+import { Howl } from "howler";
 
 window.addEventListener("contextmenu", function (e: Event) {
   e.preventDefault();
@@ -109,7 +110,18 @@ controlsBtn.addEventListener("click", () => {
   controlsPanel.classList.toggle("hidden");
 });
 
+const theme: Howl = new Howl({
+  src: ["Assets/Audio/723702__tomentum__hope-in-dark-places.wav"],
+  autoplay: true,
+  loop: true,
+  volume: 1.0,
+});
+
 function startGame() {
+  theme.fade(1, 0, 3000);
+  setTimeout(() => {
+    theme.unload();
+  }, 3000);
   mainMenu.classList.add("hidden");
   gameContext.start();
   animate();
