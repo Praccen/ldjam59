@@ -592,7 +592,7 @@ export class Platform {
   }
 
   getBlockAtOffset(offset: string): Block | undefined {
-    return this.attachedBlocks.get(offset.toString());
+    return this.attachedBlocks.get(offset);
   }
 
   getNeighborBlocks(block: Block): Block[] {

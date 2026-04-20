@@ -228,13 +228,13 @@ export default class Game {
           this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
         ) {
           const antenna1 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 5, 0)
+            vec3.fromValues(0, 5, 0).toString()
           );
           const antenna2 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 6, 0)
+            vec3.fromValues(0, 6, 0).toString()
           );
           const antenna3 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 7, 0)
+            vec3.fromValues(0, 7, 0).toString()
           );
 
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
