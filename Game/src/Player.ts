@@ -65,7 +65,7 @@ export default class Player {
 
     this.tetherParticleSpawner = scene.addNewParticleSpawner(
       "CSS:rgba(255, 255, 215, 0.77)",
-      1000
+      300
     );
     this.tetherParticleSpawner.lifeTime = 0.01;
     this.tetherParticleSpawner.randomSizeModifier.sizeMin = 0.01;

@@ -55,7 +55,7 @@ export default class Game {
   constructor(
     renderer: Renderer3D,
     guiRenderer: GUIRenderer,
-    gameGUI: GameGUI
+    gameGUI: GameGUI,
   ) {
     this.renderer = renderer;
     this.guiRenderer = guiRenderer;
@@ -88,7 +88,7 @@ export default class Game {
       this.scene,
       this.physicsScene,
       this.guiRenderer,
-      this.gameGUI
+      this.gameGUI,
     );
 
     vec3.set(this.scene.getDirectionalLight().colour, 1.0, 1.0, 0.5);
@@ -102,7 +102,7 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "Assets/Textures/8k_mars.jpg",
-        "CSS:rgb(0,0,0)"
+        "CSS:rgb(0,0,0)",
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 2000.0, 2000.0, 2000.0);
@@ -115,7 +115,7 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "CSS:rgba(118, 228, 255, 0.3)",
-        "CSS:rgb(0,0,0)"
+        "CSS:rgb(0,0,0)",
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 2040.0, 2060.0, 2060.0);
@@ -126,13 +126,13 @@ export default class Game {
       .addNewMesh(
         "Assets/objs/sphere.obj",
         "CSS:rgb(233, 224, 64)",
-        "CSS:rgb(0,0,0)"
+        "CSS:rgb(0,0,0)",
       )
       .then((gb) => {
         vec3.set(gb.transform.scale, 1000.0, 1000.0, 1000.0);
         vec3.set(gb.transform.position, 0.0, 20000.0, 0.0);
         gb.emission = this.renderer.textureStore.getTexture(
-          "CSS:rgb(233, 224, 64)"
+          "CSS:rgb(233, 224, 64)",
         );
         this.sun = gb;
       });
@@ -141,7 +141,7 @@ export default class Game {
     createStartingShip(
       this.startingPlatform,
       vec3.fromValues(0.0, 0.0, 2.0),
-      this.player
+      this.player,
     );
 
     this.debrisPlatform = new Platform(this.scene, this.physicsScene);
@@ -149,7 +149,7 @@ export default class Game {
 
     let moodParticleSpawner = this.scene.addNewParticleSpawner(
       "CSS:rgb(200, 200, 200)",
-      2000
+      1000,
     );
     moodParticleSpawner.lifeTime = 1.0;
     moodParticleSpawner.randomSizeModifier.sizeMin = 0.1;
@@ -159,19 +159,19 @@ export default class Game {
       moodParticleSpawner.randomPositionModifier.boxMin,
       -100.0,
       -100.0,
-      -100.0
+      -100.0,
     );
     vec3.set(
       moodParticleSpawner.randomPositionModifier.boxMax,
       300.0,
       100.0,
-      100.0
+      100.0,
     );
     vec3.set(
       moodParticleSpawner.randomStartVelModifier.direction,
       0.0,
       -0.5,
-      -0.5
+      -0.5,
     );
     moodParticleSpawner.randomStartVelModifier.degreesMax = 0.0;
     moodParticleSpawner.randomStartVelModifier.degreesMin = 0.0;
@@ -200,7 +200,7 @@ export default class Game {
         this.sun.transform.position,
         Math.sin(this.gameTimer * 0.2) * 20000,
         Math.cos(this.gameTimer * 0.2) * 20000.0,
-        -200.0 + Math.sin(this.gameTimer * 0.2) * 20000.0
+        -200.0 + Math.sin(this.gameTimer * 0.2) * 20000.0,
       );
     }
 
@@ -208,7 +208,7 @@ export default class Game {
       quat.rotateZ(
         this.planet.transform.rotation,
         this.planet.transform.rotation,
-        0.01 * dt
+        0.01 * dt,
       );
     }
 
@@ -223,29 +223,29 @@ export default class Game {
         vec3.sub(
           this.debrisPlatform.baseBlock.physicsObject.velocity,
           this.startingPlatform.baseBlock.physicsObject.transform.position,
-          this.debrisPlatform.baseBlock.physicsObject.transform.position
+          this.debrisPlatform.baseBlock.physicsObject.transform.position,
         );
         vec3.normalize(
           this.debrisPlatform.baseBlock.physicsObject.velocity,
-          this.debrisPlatform.baseBlock.physicsObject.velocity
+          this.debrisPlatform.baseBlock.physicsObject.velocity,
         );
         vec3.scale(
           this.debrisPlatform.baseBlock.physicsObject.velocity,
           this.debrisPlatform.baseBlock.physicsObject.velocity,
-          50
+          50,
         );
 
         if (
           this.debrisPlatform.baseBlock.physicsObject.transform.position[0] < 25
         ) {
           const antenna1 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 5, 0).toString()
+            vec3.fromValues(0, 5, 0).toString(),
           );
           const antenna2 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 6, 0).toString()
+            vec3.fromValues(0, 6, 0).toString(),
           );
           const antenna3 = this.startingPlatform.getBlockAtOffset(
-            vec3.fromValues(0, 7, 0).toString()
+            vec3.fromValues(0, 7, 0).toString(),
           );
 
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
@@ -274,7 +274,7 @@ export default class Game {
           ) {
             this.startingPlatform.resetWithNewBaseBlock(
               this.player,
-              this.detachedBlocks
+              this.detachedBlocks,
             );
           }
         }
@@ -329,7 +329,7 @@ export default class Game {
       }
       if (
         this.player.physicsObject.collisionsLastUpdate.has(
-          block.physicsObject.physicsObjectId
+          block.physicsObject.physicsObjectId,
         )
       ) {
         this.player.pickupBlock(block.type);
@@ -383,7 +383,7 @@ export default class Game {
     if (this.scene != undefined && this.sun != undefined) {
       vec3.normalize(
         this.scene.directionalLight.direction,
-        vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position)
+        vec3.sub(vec3.create(), vec3.create(), this.sun.transform.position),
       );
     }
     this.scene.updateParticleSpawners(dt);
