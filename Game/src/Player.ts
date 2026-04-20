@@ -1,4 +1,4 @@
-import { vec2, vec3 } from "gl-matrix";
+import { vec3 } from "gl-matrix";
 import {
   Camera,
   GUIRenderer,
@@ -23,6 +23,7 @@ export default class Player {
 
   pitch: number = 0.0;
   jaw: number = 0.0;
+  private camOffset: number = 0.25;
 
   private mouseWasClicked: boolean = false;
   connectedBlock: Block = null;
@@ -139,13 +140,15 @@ export default class Player {
   }
 
   updateCamera(camera: Camera) {
-    let camOffset = vec3.fromValues(0.0, 0.25, 0.0);
+    let camOffset = vec3.fromValues(0.0, 0.0, 0.0);
+    if (!this.floating) {
+      camOffset = vec3.fromValues(0.0, this.camOffset, 0.0);
+    }
     vec3.transformQuat(
       camOffset,
       camOffset,
       this.physicsObject.transform.rotation
     );
-
     camera.setPosition(
       vec3.add(vec3.create(), this.physicsObject.transform.position, camOffset)
     );
@@ -191,14 +194,17 @@ export default class Player {
       if (this.connectedBlock != null) {
         this.setConnectedBlock(null, false);
         this.floating = true;
+        const jumpDir = vec3.normalize(vec3.create(), camera.getDir() as vec3);
+        vec3.scaleAndAdd(
+          this.physicsObject.transform.position,
+          this.physicsObject.transform.position,
+          jumpDir,
+          this.camOffset
+        );
         vec3.scaleAndAdd(
           this.physicsObject.impulse,
           this.physicsObject.impulse,
-          vec3.transformQuat(
-            vec3.create(),
-            vec3.fromValues(0.0, 1.0, 0.0),
-            this.physicsObject.transform.rotation
-          ),
+          jumpDir,
           jumpForce
         );
       } else if (this.tetheredBlock != null) {
