@@ -5,7 +5,7 @@ export default class EndScreen {
 
   constructor() {
     this.theme = new Howl({
-      src: ["Assets/Audio/723702__tomentum__hope-in-dark-places.wav"],
+      src: ["Assets/Audio/237127__tyops__arcade-theme-01.wav"],
       autoplay: true,
       loop: true,
       volume: 0.5,

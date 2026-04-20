@@ -110,11 +110,19 @@ controlsBtn.addEventListener("click", () => {
   controlsPanel.classList.toggle("hidden");
 });
 
-const theme: Howl = new Howl({
-  src: ["Assets/Audio/723702__tomentum__hope-in-dark-places.wav"],
+let theme: Howl = new Howl({
+  src: ["Assets/Audio/modified_intro.wav"],
   autoplay: true,
-  loop: true,
+  loop: false,
   volume: 0.5,
+  onend: function () {
+    theme = new Howl({
+      src: ["Assets/Audio/237127__tyops__arcade-theme-01.wav"],
+      autoplay: true,
+      loop: true,
+      volume: 0.5,
+    }).fade(0, 0.5, 3000);
+  },
 });
 
 function startGame() {
