@@ -289,6 +289,13 @@ export default class Game {
 
     this.player.update(dt, this.camera, this.startingPlatform);
 
+    // Debug for activating win
+    if (
+      Input.keys["F"] &&
+      ["localhost", "127.0.0.1"].includes(location.hostname)
+    ) {
+      this.triggerWin();
+    }
     if (this.crashHappened && !this.winTriggered) {
       if (this.startingPlatform.hasAntennaComplete()) {
         this.triggerWin();
@@ -356,6 +363,10 @@ export default class Game {
         0%, 100% { opacity: 1; }
         50%       { opacity: 0; }
       }
+      @keyframes fade-to-black {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
     `;
     document.head.appendChild(style);
 
@@ -366,9 +377,9 @@ export default class Game {
     el.style.height = "100%";
     el.style.position = "absolute";
     el.style.top = "42%";
-    el.style.left = "47%";
+    el.style.left = "46.5%";
     el.style.pointerEvents = "none";
-    el.style.zIndex = "500";
+    el.style.zIndex = "1001";
 
     const text = this.guiRenderer.getNew2DText(div);
     text.ignoreEngineModifiers = true;
@@ -380,9 +391,31 @@ export default class Game {
     text.textString = "Antenna activating...";
     const textEl = text.getElement();
     textEl.style.color = "rgb(80, 255, 120)";
-    textEl.style.textShadow =
-      "0 0 20px rgba(80, 255, 120, 0.8), 0 0 40px rgba(80, 255, 120, 0.5)";
     textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
+
+    setTimeout(() => {
+      const fadeDiv = this.guiRenderer.getNewDiv();
+      fadeDiv.ignoreEngineModifiers = true;
+      const fadeEl = fadeDiv.getElement();
+      fadeEl.style.width = "100%";
+      fadeEl.style.height = "100%";
+      fadeEl.style.position = "fixed";
+      fadeEl.style.top = "0";
+      fadeEl.style.left = "0";
+      fadeEl.style.backgroundColor = "black";
+      fadeEl.style.pointerEvents = "none";
+      fadeEl.style.zIndex = "1000";
+      fadeEl.style.opacity = "0";
+      fadeEl.style.animation = "fade-to-black 3s ease-in forwards";
+    }, 2000);
+    setTimeout(() => {
+      text.textString = "";
+      textEl.style.animation = "";
+    }, 2500);
+
+    setTimeout(() => {
+      text.textString = "Signal received.";
+    }, 3500);
   }
 
   preRenderingUpdate(dt: number) {
