@@ -8,11 +8,15 @@ import {
   PhysicsObject,
   PhysicsScene,
   quat,
+  Ray,
   Renderer3D,
   Scene,
+  Shape,
+  ShapeGraphicsObject,
   TextObject2D,
   Transform,
   vec3,
+  vec4,
 } from "praccen-web-engine";
 import { Input } from "../Input.js";
 import { sensitivity } from "./GameContext.js";
@@ -48,6 +52,8 @@ export default class Game {
 
   private antennaBlocks: Map<Block, { target: vec3; arrived: boolean }> =
     new Map();
+
+  private targetBlockShape: Shape;
 
   private crashHappened = false;
   private winTriggered = false;
@@ -144,8 +150,8 @@ export default class Game {
       this.player,
     );
 
-    this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
+    // this.debrisPlatform = new Platform(this.scene, this.physicsScene);
+    // createDebrisShip(this.debrisPlatform, vec3.fromValues(200.0, 0.0, 0.0));
 
     let moodParticleSpawner = this.scene.addNewParticleSpawner(
       "CSS:rgb(200, 200, 200)",
@@ -387,6 +393,29 @@ export default class Game {
       );
     }
     this.scene.updateParticleSpawners(dt);
+    let ray = new Ray();
+    ray.setStartAndDir(this.camera.getPosition(), this.camera.getDir());
+    let hit = this.physicsScene.doRayCast(
+      ray,
+      false,
+      [this.player.physicsObject, this.player.connectedBlock.physicsObject],
+      10.0,
+    );
+
+    if (hit.object != undefined) {
+      let block = this.startingPlatform.getBlockFromPhysicsObject(hit.object);
+      if (block != undefined) {
+        if (
+          this.targetBlockShape == undefined ||
+          this.targetBlockShape != block.physicsObject.boundingBox
+        ) {
+          this.scene.deleteShape(this.targetBlockShape);
+          let shapeGb = this.scene.addNewShape(block.physicsObject.boundingBox);
+          vec4.set(shapeGb.colour, 1.0, 1.0, 1.0, 1.0);
+          this.targetBlockShape = block.physicsObject.boundingBox;
+        }
+      }
+    }
   }
 
   draw() {
