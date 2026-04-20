@@ -54,14 +54,23 @@ export default class Game {
   private debrisPlatform: Platform;
   private detachedBlocks: Block[] = [];
 
-  private antennaBlocks: Map<Block, { target: vec3; arrived: boolean }> =
-    new Map();
+  private antennaBlocksWithFixedPostions: Map<
+    Block,
+    { target: vec3; arrived: boolean }
+  > = new Map();
 
   private targetBlockShape: Shape;
 
   private crashHappened = false;
   private winTriggered = false;
   isGameOver = false;
+
+  private antennaBlocksOfInterest: Block[] = [];
+  private antennaTypesLeftToPickUp: BlockType[] = [
+    BlockType.ANTENNA1,
+    BlockType.ANTENNA2,
+    BlockType.ANTENNA3,
+  ];
 
   constructor(
     renderer: Renderer3D,
@@ -293,7 +302,7 @@ export default class Game {
             block.physicsObject.isImmovable = true;
             vec3.zero(block.physicsObject.velocity);
             vec3.zero(block.physicsObject.impulse);
-            this.antennaBlocks.set(block, {
+            this.antennaBlocksWithFixedPostions.set(block, {
               target,
               arrived: false,
             });
@@ -312,7 +321,7 @@ export default class Game {
     // Debug for activating win
     if (
       Input.keys["F"] &&
-      ["localhost", "127.0.0.1"].includes(location.hostname)
+      ["localhost", "127.0.0.1"].indexOf(location.hostname) >= 0
     ) {
       this.triggerWin();
     }
@@ -323,7 +332,7 @@ export default class Game {
     }
 
     // Move and lock antennas
-    for (const [block, state] of this.antennaBlocks) {
+    for (const [block, state] of this.antennaBlocksWithFixedPostions) {
       if (!state.arrived) {
         const pos = block.graphicsBundle.transform.position;
         const dir = vec3.sub(vec3.create(), state.target, pos);
@@ -336,7 +345,7 @@ export default class Game {
           vec3.copy(pos, state.target);
           state.arrived = true;
           block.physicsObject.isImmovable = true;
-          this.antennaBlocks.delete(block);
+          this.antennaBlocksWithFixedPostions.delete(block);
         }
       }
     }
@@ -352,7 +361,7 @@ export default class Game {
         return false;
       }
       // Keep antenna blocks that are still lerping to their final positions.
-      if (this.antennaBlocks.has(block)) {
+      if (this.antennaBlocksWithFixedPostions.has(block)) {
         return true;
       }
       if (vec3.sqrLen(block.getWorldPos()) > Math.pow(100, 2.0)) {
@@ -383,6 +392,12 @@ export default class Game {
         ) < 2.0
       ) {
         this.player.pickupBlock(block.type);
+        if (this.antennaTypesLeftToPickUp.indexOf(block.type) >= 0) {
+          this.antennaTypesLeftToPickUp.splice(
+            this.antennaTypesLeftToPickUp.indexOf(block.type),
+            1,
+          );
+        }
         this.scene.deleteGraphicsBundle(block.graphicsBundle);
         this.physicsScene.removePhysicsObject(block.physicsObject);
         return false;
@@ -536,6 +551,37 @@ export default class Game {
     } else {
       this.scene.deleteShape(this.targetBlockShape);
       this.targetBlockShape = null!;
+    }
+
+    if (this.crashHappened) {
+      // Check that all detached blocks with wanted antenna type has a visible shape rendered
+      for (const block of this.detachedBlocks) {
+        if (this.antennaTypesLeftToPickUp.indexOf(block.type) >= 0) {
+          if (this.antennaBlocksOfInterest.indexOf(block) == -1) {
+            let shapeGO = this.scene.addNewShape(
+              block.physicsObject.boundingBox,
+            );
+            vec4.set(shapeGO.colour, 0.0, 1.0, 0.0, 1.0);
+            this.antennaBlocksOfInterest.push(block);
+          }
+        }
+      }
+
+      // The other way around, make sure no outline exist if the block no longer is detached or if we have already picked up the type of antenna
+      for (let i = 0; i < this.antennaBlocksOfInterest.length; i++) {
+        if (
+          this.detachedBlocks.indexOf(this.antennaBlocksOfInterest[i]) == -1 ||
+          this.antennaTypesLeftToPickUp.indexOf(
+            this.antennaBlocksOfInterest[i].type,
+          ) == -1
+        ) {
+          this.scene.deleteShape(
+            this.antennaBlocksOfInterest[i].physicsObject.boundingBox,
+          );
+          this.antennaBlocksOfInterest.splice(i, 1);
+          i--;
+        }
+      }
     }
   }
 
