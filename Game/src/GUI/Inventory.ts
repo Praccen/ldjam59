@@ -30,6 +30,7 @@ export default class ActionBar {
   private slotIcons: HTMLImageElement[] = [];
 
   private selectedIndex: number = 0;
+  private tetherLengthText: TextObject2D;
 
   constructor(gui: GUIRenderer, gameGUI: GameGUI) {
     this.gui = gui;
@@ -98,6 +99,30 @@ export default class ActionBar {
     }
 
     this.updateUI();
+
+    // Tether label — lives inside the root flex bar, right of the slots
+    const tetherDiv = gui.getNewDiv(this.root);
+    tetherDiv.ignoreEngineModifiers = true;
+    const tetherEl = tetherDiv.getElement();
+    tetherEl.style.display = "flex";
+    tetherEl.style.flexDirection = "column";
+    tetherEl.style.alignItems = "center";
+    tetherEl.style.justifyContent = "center";
+    tetherEl.style.borderLeft = "1px solid #555";
+    tetherEl.style.marginLeft = "185px";
+    tetherEl.style.marginTop = "-20px";
+    tetherEl.style.gap = "2px";
+    tetherEl.style.textShadow =
+      "-0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black";
+
+    this.tetherLengthText = gui.getNew2DText(tetherDiv);
+    this.tetherLengthText.ignoreEngineModifiers = true;
+    this.tetherLengthText.scaleWithWindow = false;
+    this.tetherLengthText.size = 14;
+    this.tetherLengthText.getElement().style.color = "rgb(255, 213, 0)";
+    this.tetherLengthText.getElement().style.whiteSpace = "nowrap";
+    this.tetherLengthText.textString =
+      "[Q] Extend tether with scraps.    Tether length: 5";
   }
 
   // ---- Public API ----
@@ -124,6 +149,24 @@ export default class ActionBar {
     console.log("Action bar full");
   }
 
+  convertSelectedScrapToTether(): boolean {
+    const item = this.slots[this.selectedIndex];
+    if (!item) return false;
+    if (
+      item.type === BlockType.ANTENNA1 ||
+      item.type === BlockType.ANTENNA2 ||
+      item.type === BlockType.ANTENNA3
+    )
+      return false;
+
+    item.amount--;
+    if (item.amount <= 0) {
+      this.slots[this.selectedIndex] = null;
+    }
+    this.updateUI();
+    return true;
+  }
+
   useSelected(): ItemType | null {
     const item = this.slots[this.selectedIndex];
     if (!item) return null;
@@ -137,6 +180,10 @@ export default class ActionBar {
     this.updateUI();
 
     return item.type;
+  }
+
+  setTetherLength(length: number) {
+    this.tetherLengthText.textString = `[Q] Extend tether with scraps.    Tether length: ${length}`;
   }
 
   // ---- Update ----

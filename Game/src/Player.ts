@@ -26,6 +26,7 @@ export default class Player {
   pitch: number = 0.0;
   jaw: number = 0.0;
   private camOffset: number = 0.25;
+  private tetherLength: number = 5.0;
 
   private mouseWasClicked: boolean = false;
   connectedBlock: Block = null;
@@ -33,6 +34,7 @@ export default class Player {
   private lerpSpeed: number = 2.5;
   private lerpMovefloating: boolean = false;
 
+  private convertingScrap: boolean = false;
   private mouseRightWasClicked: boolean = false;
   private floating: boolean = true;
 
@@ -199,7 +201,7 @@ export default class Player {
         this.physicsObject.transform.position,
         blockPos
       );
-      if (dist >= 5.0) {
+      if (dist >= this.tetherLength) {
         vec3.scaleAndAdd(
           this.physicsObject.impulse,
           this.physicsObject.impulse,
@@ -330,6 +332,18 @@ export default class Player {
       this.mouseWasClicked = true;
     } else {
       this.mouseWasClicked = false;
+    }
+
+    if (Input.keys["Q"]) {
+      if (!this.convertingScrap) {
+        if (this.inventory.convertSelectedScrapToTether()) {
+          this.tetherLength += 1;
+          this.inventory.setTetherLength(this.tetherLength);
+        }
+      }
+      this.convertingScrap = true;
+    } else {
+      this.convertingScrap = false;
     }
 
     if (Input.mouseRightClicked && this.connectedBlock != null) {
