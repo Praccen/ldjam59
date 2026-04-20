@@ -114,13 +114,13 @@ let theme: Howl = new Howl({
   src: ["Assets/Audio/modified_intro.wav"],
   autoplay: true,
   loop: false,
-  volume: 0.5,
+  volume: 0.1,
   onend: function () {
     theme = new Howl({
       src: ["Assets/Audio/237127__tyops__arcade-theme-01.wav"],
       autoplay: true,
       loop: true,
-      volume: 0.5,
+      volume: 0.1,
     }).fade(0, 0.5, 3000);
   },
 });

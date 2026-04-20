@@ -44,6 +44,7 @@ export default class Game {
   physicsScene: PhysicsScene;
 
   ambient: Howl = null;
+  breathing: Howl = null;
 
   private gameTimer = 0.0;
 
@@ -269,7 +270,13 @@ export default class Game {
           const antenna3 = this.startingPlatform.getBlockAtOffset(
             vec3.fromValues(0, 7, 0).toString(),
           );
-
+          new Howl({
+            src: [
+              "Assets/Audio/daviddumaisaudio-large-underwater-explosion-190270.mp3",
+            ],
+            autoplay: true,
+            volume: 0.5,
+          });
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50, 800.0);
           this.startingPlatform.splitPlatform(this.detachedBlocks, 400.0);
           this.crashHappened = true;
@@ -421,7 +428,7 @@ export default class Game {
     new Howl({
       src: ["Assets/Audio/58932__electrosnail__radio_noises.mp3"],
       autoplay: true,
-      volume: 0.2,
+      volume: 0.1,
     });
 
     const fadeDiv = this.guiRenderer.getNewDiv();
@@ -450,7 +457,7 @@ export default class Game {
       new Howl({
         src: ["Assets/Audio/459838__eschwabe3__ship-radar.wav"],
         autoplay: true,
-        volume: 0.5,
+        volume: 0.001,
       }).fade(0.5, 0, 3000);
     }, 3500);
 

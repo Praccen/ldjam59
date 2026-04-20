@@ -3,6 +3,7 @@ import Game from "./Game.js";
 import { Input } from "../Input.js";
 import MetaGUI from "../GUI/MetaGUI.js";
 import GameGUI from "../GUI/GameGUI.js";
+import { Howl } from "howler";
 
 export let sensitivity = 1.0;
 
@@ -13,6 +14,7 @@ export default class GameContext {
   game: Game;
   metaGui: MetaGUI;
   gameGui: GameGUI;
+  breathing: Howl = null;
 
   constructor() {
     // Create a renderer and attach it to the document body
@@ -60,6 +62,12 @@ export default class GameContext {
 
   start() {
     document.body.requestPointerLock();
+    this.breathing = new Howl({
+      src: ["Assets/Audio/256519__kodack__mask-breathing-sound.wav"],
+      autoplay: true,
+      loop: true,
+      volume: 0.15,
+    });
   }
 
   update(dt: number) {

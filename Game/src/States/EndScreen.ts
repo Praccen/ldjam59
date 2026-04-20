@@ -8,7 +8,7 @@ export default class EndScreen {
       src: ["Assets/Audio/237127__tyops__arcade-theme-01.wav"],
       autoplay: true,
       loop: true,
-      volume: 0.5,
+      volume: 0.1,
     });
 
     document.exitPointerLock();
