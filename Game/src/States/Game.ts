@@ -1,5 +1,6 @@
 import {
   Camera,
+  Div,
   Frustum,
   GraphicsBundle,
   GUIRenderer,
@@ -9,6 +10,7 @@ import {
   quat,
   Renderer3D,
   Scene,
+  TextObject2D,
   Transform,
   vec3,
 } from "praccen-web-engine";
@@ -46,6 +48,9 @@ export default class Game {
 
   private antennaBlocks: Map<Block, { target: vec3; arrived: boolean }> =
     new Map();
+
+  private crashHappened = false;
+  private winTriggered = false;
 
   constructor(
     renderer: Renderer3D,
@@ -245,6 +250,7 @@ export default class Game {
 
           this.debrisPlatform.splitPlatform(this.detachedBlocks, 50);
           this.startingPlatform.splitPlatform(this.detachedBlocks, 130);
+          this.crashHappened = true;
 
           const antennaTargets: [Block | undefined, vec3][] = [
             [antenna1, vec3.fromValues(3, 0, 0)],
@@ -276,6 +282,12 @@ export default class Game {
     }
 
     this.player.update(dt, this.camera, this.startingPlatform);
+
+    if (this.crashHappened && !this.winTriggered) {
+      if (this.startingPlatform.hasAntennaComplete()) {
+        this.triggerWin();
+      }
+    }
 
     // Move and lock antennas
     for (const [block, state] of this.antennaBlocks) {
@@ -327,6 +339,44 @@ export default class Game {
       }
       return true;
     });
+  }
+
+  private triggerWin() {
+    this.winTriggered = true;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes antenna-pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const div = this.guiRenderer.getNewDiv();
+    div.ignoreEngineModifiers = true;
+    const el = div.getElement();
+    el.style.width = "100%";
+    el.style.height = "100%";
+    el.style.position = "absolute";
+    el.style.top = "42%";
+    el.style.left = "47%";
+    el.style.pointerEvents = "none";
+    el.style.zIndex = "500";
+
+    const text = this.guiRenderer.getNew2DText(div);
+    text.ignoreEngineModifiers = true;
+    text.scaleWithWindow = false;
+    text.size = 40;
+    text.center = true;
+    text.position[0] = 0.5;
+    text.position[1] = 0.5;
+    text.textString = "Antenna activating...";
+    const textEl = text.getElement();
+    textEl.style.color = "rgb(80, 255, 120)";
+    textEl.style.textShadow =
+      "0 0 20px rgba(80, 255, 120, 0.8), 0 0 40px rgba(80, 255, 120, 0.5)";
+    textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
   }
 
   preRenderingUpdate(dt: number) {

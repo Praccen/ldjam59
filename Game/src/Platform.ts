@@ -622,6 +622,19 @@ export class Platform {
     return neighbors;
   }
 
+  hasAntennaComplete(): boolean {
+    let has1 = false,
+      has2 = false,
+      has3 = false;
+    for (const block of this.attachedBlocks.values()) {
+      if (!block) continue;
+      if (block.type === BlockType.ANTENNA1) has1 = true;
+      if (block.type === BlockType.ANTENNA2) has2 = true;
+      if (block.type === BlockType.ANTENNA3) has3 = true;
+    }
+    return has1 && has2 && has3;
+  }
+
   splitPlatform(detachedBlocks: Block[], pieceMass: number = 1.0) {
     for (let block of this.attachedBlocks) {
       if (block[1] == undefined) {
