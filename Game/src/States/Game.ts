@@ -414,10 +414,20 @@ export default class Game {
     text.center = true;
     text.position[0] = 0.5;
     text.position[1] = 0.5;
-    text.textString = "Antenna activating...";
+    text.textString = "";
     const textEl = text.getElement();
     textEl.style.color = "rgb(80, 255, 120)";
-    textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
+
+    const fullText = "Antenna activating...";
+    let charIndex = 0;
+    const typeInterval = setInterval(() => {
+      charIndex++;
+      text.textString = fullText.slice(0, charIndex);
+      if (charIndex >= fullText.length) {
+        clearInterval(typeInterval);
+        textEl.style.animation = "antenna-pulse 1.5s ease-in-out infinite";
+      }
+    }, 80);
 
     new Howl({
       src: ["Assets/Audio/58932__electrosnail__radio_noises.mp3"],
@@ -447,7 +457,16 @@ export default class Game {
         textEl.style.animation = "";
         setTimeout(() => {
           // Set signal received and start signal sound aftar 3.5 sec
-          text.textString = "Signal received.";
+          const signalText = "Signal received.";
+          let signalCharIndex = 0;
+          text.textString = "";
+          const signalTypeInterval = setInterval(() => {
+            signalCharIndex++;
+            text.textString = signalText.slice(0, signalCharIndex);
+            if (signalCharIndex >= signalText.length) {
+              clearInterval(signalTypeInterval);
+            }
+          }, 80);
           new Howl({
             src: ["Assets/Audio/459838__eschwabe3__ship-radar.wav"],
             autoplay: true,
