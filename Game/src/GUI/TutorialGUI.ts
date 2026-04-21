@@ -46,7 +46,7 @@ export default class TutorialGUI {
 
     this.textEl.style.position = "absolute";
     this.textEl.style.left = "40px";
-    this.textEl.style.top = "50%";
+    this.textEl.style.top = "20%";
     this.textEl.style.transform = "translateY(-50%)";
 
     this.textEl.style.width = "30%";
@@ -72,7 +72,7 @@ export default class TutorialGUI {
     this.videoEl = document.createElement("video");
     this.videoEl.style.position = "absolute";
     this.videoEl.style.right = "40px";
-    this.videoEl.style.top = "50%";
+    this.videoEl.style.top = "20%";
     this.videoEl.style.transform = "translateY(-50%)";
 
     this.videoEl.style.width = "30%";
@@ -184,6 +184,7 @@ export default class TutorialGUI {
 
     this.active = true;
     this.root.setHidden(false);
+    this.updateStep();
   }
 
   getStep(): number {
