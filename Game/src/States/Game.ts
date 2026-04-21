@@ -171,7 +171,7 @@ export default class Game {
     );
 
     this.debrisPlatform = new Platform(this.scene, this.physicsScene);
-    createDebrisShip(this.debrisPlatform, vec3.fromValues(1000.0, 0.0, 0.0));
+    createDebrisShip(this.debrisPlatform, vec3.fromValues(600.0, 0.0, 0.0));
 
     let moodParticleSpawner = this.scene.addNewParticleSpawner(
       "CSS:rgb(200, 200, 200)",
@@ -316,7 +316,12 @@ export default class Game {
       }
     }
 
-    this.player.update(dt, this.camera, this.startingPlatform);
+    this.player.update(
+      dt,
+      this.camera,
+      this.startingPlatform,
+      this.crashHappened,
+    );
 
     // Debug for activating win
     if (

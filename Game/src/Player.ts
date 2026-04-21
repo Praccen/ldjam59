@@ -16,6 +16,16 @@ import ActionBar from "./GUI/Inventory";
 const jumpForce: number = 6.0;
 const sensitivity: number = 0.4;
 
+const introKeyFrames = [
+  { time: 0.0, pitch: 0.0, jaw: 0.0 },
+  { time: 2.0, pitch: 0.0, jaw: 0.0 },
+  { time: 4.0, pitch: 50.0, jaw: 180.0 },
+  { time: 7.0, pitch: -20.0, jaw: 180.0 },
+  { time: 8.0, pitch: 0.0, jaw: 90.0 },
+  { time: 11.5, pitch: 0.0, jaw: 90.0 },
+  { time: 12.0, pitch: 0.0, jaw: 180.0 },
+];
+
 export default class Player {
   private guiRenderer: GUIRenderer;
   private gameGUI: GameGUI;
@@ -45,6 +55,8 @@ export default class Player {
 
   private tetherParticleSpawner: ParticleSpawner;
   private tetherTension: number = 0.0;
+
+  private introTimer: number = 0.0;
 
   constructor(
     scene: Scene,
@@ -90,19 +102,44 @@ export default class Player {
     }
   }
 
-  update(dt: number, camera: Camera, platform: Platform) {
+  update(
+    dt: number,
+    camera: Camera,
+    platform: Platform,
+    crashHappened: boolean,
+  ) {
     this.tetherTension = 0.0;
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
-    if (document.pointerLockElement == document.body) {
-      this.pitch -= mouseDiff[1] * sensitivity;
-      this.jaw -= mouseDiff[0] * sensitivity;
 
-      this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
-      this.jaw = this.jaw % 360;
+    if (crashHappened) {
+      if (document.pointerLockElement == document.body) {
+        this.pitch -= mouseDiff[1] * sensitivity;
+        this.jaw -= mouseDiff[0] * sensitivity;
+
+        this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
+        this.jaw = this.jaw % 360;
+      }
+
+      this.handleInput(camera, platform);
+    } else {
+      this.introTimer += dt;
+      for (let i = 0; i < introKeyFrames.length - 1; i++) {
+        if (
+          this.introTimer > introKeyFrames[i].time &&
+          this.introTimer < introKeyFrames[i + 1].time
+        ) {
+          const timeDiff = introKeyFrames[i + 1].time - introKeyFrames[i].time;
+          const pitchDiff =
+            introKeyFrames[i + 1].pitch - introKeyFrames[i].pitch;
+          const jawDiff = introKeyFrames[i + 1].jaw - introKeyFrames[i].jaw;
+          const t = (this.introTimer - introKeyFrames[i].time) / timeDiff;
+          const progress = t * t * (3 - 2 * t);
+          this.pitch = introKeyFrames[i].pitch + pitchDiff * progress;
+          this.jaw = introKeyFrames[i].jaw + jawDiff * progress;
+        }
+      }
     }
-
-    this.handleInput(camera, platform);
 
     this.setPositionFromBlock(dt);
 
