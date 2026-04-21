@@ -390,175 +390,87 @@ export class Platform {
     });
   }
 
-  placeBlockFromRayCast(
-    type: BlockType,
+  raycastClosestBlock(
     camera: Camera,
     player: Player,
-  ): boolean {
-    const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type !== BlockType.EMPTY)
-      .map((block) => block.physicsObject);
-
+  ): { block: Block; key: string; offset: vec3; distance: number } | null {
     let ray = new Ray();
     ray.setStartAndDir(camera.getPosition(), camera.getDir());
-    let hit = this.physicsScene.doRayCast(
-      ray,
-      false,
-      [player.physicsObject, player.connectedBlock?.physicsObject].concat(
-        filtered,
-      ),
-      100.0,
-    );
+
+    let ignoreList = [player.physicsObject];
+    if (player.connectedBlock != null) {
+      ignoreList.push(player.connectedBlock.physicsObject);
+    }
+    let hit = this.physicsScene.doRayCast(ray, false, ignoreList, 100.0);
     if (hit.object == undefined) {
-      return false;
+      return null;
     }
 
-    if (
-      !this.physicsObjectIdToAttachedBlocksKey.has(hit.object.physicsObjectId)
-    ) {
-      return false;
-    }
-
-    const key = this.physicsObjectIdToAttachedBlocksKey.get(
+    let key = this.physicsObjectIdToAttachedBlocksKey.get(
       hit.object.physicsObjectId,
     );
+    if (key == undefined) {
+      return null;
+    }
+
+    let block = this.getBlockAtOffset(key);
+    if (block == undefined) {
+      return null;
+    }
+
     const [x, y, z] = key.split(",").map(Number);
     const offset = vec3.fromValues(x, y, z);
-    this.addBlock(offset, type);
 
+    return { block, key, offset, distance: hit.distance };
+  }
+
+  canRemoveBlock(block: Block, player: Player): boolean {
+    if (block == player.tetheredBlock) {
+      return false;
+    }
+    if (block == this.baseBlock) {
+      return false;
+    }
+    if (player.tetheredBlock) {
+      const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
+        (b) => b.type !== BlockType.EMPTY,
+      );
+      if (neighbors.length == 1 && neighbors[0] == block) {
+        return false;
+      }
+    }
     return true;
   }
 
-  showRemovableBlock(camera: Camera, player: Player) {
-    // Ignore  empty blocks
-    const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block != null && block.type == BlockType.EMPTY)
-      .map((block) => block.physicsObject);
-
-    let ray = new Ray();
-    ray.setStartAndDir(camera.getPosition(), camera.getDir());
-
-    let ignoredObjects = [
-      player.physicsObject,
-      player.tetheredBlock.physicsObject,
-    ].concat(filtered);
-
-    // Find out if tethered block only has one real neighbor, if so do not remove it
-    const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type !== BlockType.EMPTY,
-    );
-    if (neighbors.length == 1) {
-      ignoredObjects.push(neighbors.at(0).physicsObject);
-    }
-    let hit = this.physicsScene.doRayCast(ray, false, ignoredObjects, 2.0);
-    if (hit.object == undefined) {
-      return null;
-    }
-    let hitBlock = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
-    );
-    if (hitBlock == undefined) {
-      return null;
+  highlightBlock(camera: Camera, player: Player) {
+    let result = this.raycastClosestBlock(camera, player);
+    if (result == null) {
+      return;
     }
 
-    if (hitBlock.graphicsBundle != null) {
-      hitBlock.graphicsBundle.diffuse =
+    let { block } = result;
+
+    if (block.type == BlockType.EMPTY) {
+      // Show empty block preview
+      block.graphicsBundle.enabled = true;
+      // TODO do this in a better way
+      setTimeout(() => {
+        block.graphicsBundle.enabled = false;
+      }, 500);
+    } else if (this.canRemoveBlock(block, player)) {
+      // Show removable block preview
+      block.graphicsBundle.diffuse =
         this.scene.renderer.textureStore.getTexture(
           "CSS:rgba(255, 0, 0, 0.25)",
         );
-
       // TODO do this in a better way?
       setTimeout(() => {
-        hitBlock.graphicsBundle.diffuse =
+        block.graphicsBundle.diffuse =
           this.scene.renderer.textureStore.getTexture(
-            BlockTypeToColorMap.get(hitBlock.type)!,
+            BlockTypeToColorMap.get(block.type)!,
           );
       }, 500);
     }
-  }
-
-  showEmptyBlock(camera: Camera, player: Player) {
-    // Ignore none empty blocks
-    const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type !== BlockType.EMPTY)
-      .map((block) => block.physicsObject);
-
-    let ray = new Ray();
-    ray.setStartAndDir(camera.getPosition(), camera.getDir());
-    let hit = this.physicsScene.doRayCast(
-      ray,
-      false,
-      [player.physicsObject, player.connectedBlock.physicsObject].concat(
-        filtered,
-      ),
-      2.0,
-    );
-    if (hit.object == undefined) {
-      return null;
-    }
-    let hitEmptyBlock = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
-    );
-    if (hitEmptyBlock == undefined) {
-      return null;
-    }
-    if (hitEmptyBlock.graphicsBundle != null) {
-      hitEmptyBlock.graphicsBundle.enabled = true;
-
-      // TODO do this in a better way
-      setTimeout(() => {
-        hitEmptyBlock.graphicsBundle.enabled = false;
-      }, 500);
-    }
-  }
-
-  removeBlockFromRayCast(camera: Camera, player: Player): BlockType | null {
-    // Ignore empty blocks
-    const filtered = [...this.attachedBlocks.values()]
-      .filter((block) => block.type === BlockType.EMPTY)
-      .map((block) => block.physicsObject);
-
-    let ray = new Ray();
-    ray.setStartAndDir(camera.getPosition(), camera.getDir());
-
-    let ignoredObjects = [
-      player.physicsObject,
-      player.tetheredBlock.physicsObject,
-    ].concat(filtered);
-
-    // Find out if tethered block only has one real neighbor, if so do not remove it
-    const neighbors = this.getNeighborBlocks(player.tetheredBlock).filter(
-      (block) => block.type !== BlockType.EMPTY,
-    );
-    if (neighbors.length == 1) {
-      ignoredObjects.push(neighbors.at(0).physicsObject);
-    }
-    let hit = this.physicsScene.doRayCast(ray, false, ignoredObjects, 2.0);
-    if (hit.object == undefined) {
-      return null;
-    }
-
-    if (
-      !this.physicsObjectIdToAttachedBlocksKey.has(hit.object.physicsObjectId)
-    ) {
-      return null;
-    }
-
-    let type = this.getBlockAtOffset(
-      this.physicsObjectIdToAttachedBlocksKey.get(hit.object.physicsObjectId)!,
-    )!.type;
-
-    if (
-      this.removeBlock(
-        this.physicsObjectIdToAttachedBlocksKey.get(
-          hit.object.physicsObjectId,
-        )!,
-      )
-    ) {
-      return type;
-    }
-
-    return null;
   }
 
   removeBlock(key: string): boolean {

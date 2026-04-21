@@ -349,14 +349,20 @@ export default class Player {
 
     if (Input.mouseClicked) {
       if (!this.mouseWasClicked) {
-        let typeRemove = platform.removeBlockFromRayCast(camera, this);
-        if (typeRemove != undefined) {
-          this.pickupBlock(typeRemove!);
-        } else {
-          let type = this.inventory.useSelected();
-          if (type != undefined) {
-            if (!platform.placeBlockFromRayCast(type, camera, this)) {
-              this.inventory.addItem(type); // Couldn't place block, give it back to inventory
+        let result = platform.raycastClosestBlock(camera, this);
+        if (result) {
+          let { block, key, offset, distance } = result;
+          if (block.type == BlockType.EMPTY) {
+            // Closest block is empty try to place
+            let type = this.inventory.useSelected();
+            if (type != undefined) {
+              if (!platform.addBlock(offset, type)) {
+                this.inventory.addItem(type);
+              }
+            }
+          } else if (distance <= 2.0 && platform.canRemoveBlock(block, this)) {
+            if (platform.removeBlock(key)) {
+              this.pickupBlock(block.type);
             }
           }
         }
@@ -379,8 +385,7 @@ export default class Player {
     }
 
     if (Input.mouseRightClicked && this.connectedBlock != null) {
-      platform.showEmptyBlock(camera, this);
-      platform.showRemovableBlock(camera, this);
+      platform.highlightBlock(camera, this);
       if (!this.mouseRightWasClicked) {
       }
       this.mouseRightWasClicked = true;
