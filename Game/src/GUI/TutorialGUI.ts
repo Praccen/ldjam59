@@ -120,7 +120,7 @@ export default class TutorialGUI {
         video: "Assets/tutorial/tether.mp4",
       },
       {
-        text: "Press [Q] to scrap inventory\nThis extends your tether range",
+        text: "Press [Q] to scrap inventory\nThis extends your tether range\n(Antenna pieces can not be scrapped)",
         video: "Assets/tutorial/scrap.mp4",
       },
       {
