@@ -138,7 +138,7 @@ export function createDebrisShip(
     .then((baseBlock) => {
       baseBlock.graphicsBundle.transform.position = baseBlockStartingPosition;
       baseBlock.physicsObject.drag = 0.0;
-      vec3.set(baseBlock.physicsObject.momentum, 90.0, 56.0, 82.0);
+      vec3.set(baseBlock.physicsObject.momentum, 150.0, 56.0, 82.0);
 
       platform.addBlock(vec3.fromValues(0, 1, 0), BlockType.FLOOR);
       platform.addBlock(vec3.fromValues(0, 2, 0), BlockType.FLOOR);

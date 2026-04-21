@@ -246,6 +246,12 @@ export default class Game {
         this.startingPlatform != undefined &&
         this.startingPlatform.baseBlock != undefined
       ) {
+        if (Input.keys["ESCAPE"]) {
+          this.debrisPlatform.baseBlock.physicsObject.transform.position[0] = 2.5;
+          this.player.pitch = 0.0;
+          this.player.jaw = 180.0;
+        }
+
         vec3.sub(
           this.debrisPlatform.baseBlock.physicsObject.velocity,
           this.startingPlatform.baseBlock.physicsObject.transform.position,
