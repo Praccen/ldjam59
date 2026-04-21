@@ -36,7 +36,7 @@ export default class ActionBar {
     this.gui = gui;
 
     // Root container (bottom center)
-    this.root = gui.getNewDiv(gameGUI.inventoryDiv);
+    this.root = gui.getNewDiv();
     this.root.ignoreEngineModifiers = true;
     const el = this.root.getElement();
 

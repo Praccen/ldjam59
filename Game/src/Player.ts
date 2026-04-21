@@ -12,6 +12,7 @@ import { Input } from "./Input";
 import { Block, BlockType, Platform } from "./Platform";
 import GameGUI from "./GUI/GameGUI";
 import ActionBar from "./GUI/Inventory";
+import TutorialGUI from "./GUI/TutorialGUI";
 
 const jumpForce: number = 6.0;
 const sensitivity: number = 0.4;
@@ -49,14 +50,26 @@ export default class Player {
   private floating: boolean = true;
 
   private picking: boolean = false;
-  private jumping: boolean = false;
 
   private inventory: ActionBar;
 
   private tetherParticleSpawner: ParticleSpawner;
   private tetherTension: number = 0.0;
 
-  private introTimer: number = 0.0;
+  private playerTimer: number = 0.0;
+  private tutorialGUI: TutorialGUI;
+
+  private hasLooked: boolean = false;
+  private totalLookTime: number = 0.0;
+  private hasMoved: boolean = false;
+  private hasJumped: boolean = false;
+  private totalPullTime: number = 0.0;
+  private hasPulled: boolean = false;
+  private hasScrapped: boolean = false;
+  private hasPreviewed: boolean = false;
+  private hasBuilt: boolean = false;
+  private hasRemoved: boolean = false;
+  private hasPickedUpAntennaPiece: boolean = false;
 
   constructor(
     scene: Scene,
@@ -82,6 +95,8 @@ export default class Player {
     this.tetherParticleSpawner.lifeTime = 0.01;
     this.tetherParticleSpawner.randomSizeModifier.sizeMin = 0.01;
     this.tetherParticleSpawner.randomSizeModifier.sizeMax = 0.01;
+
+    this.tutorialGUI = new TutorialGUI(guiRenderer);
   }
 
   setTetheredBlock(block: Block) {
@@ -108,6 +123,7 @@ export default class Player {
     platform: Platform,
     crashHappened: boolean,
   ) {
+    this.playerTimer += dt;
     this.tetherTension = 0.0;
     // Rotate camera with mouse
     let mouseDiff = Input.getMouseMovement();
@@ -119,21 +135,62 @@ export default class Player {
 
         this.pitch = Math.max(Math.min(this.pitch, 89), -89); // Don't allow the camera to go past 89 degrees
         this.jaw = this.jaw % 360;
+
+        if (mouseDiff[0] != 0.0 || mouseDiff[1] != 0.0) {
+          this.hasLooked = true;
+          this.totalLookTime += dt;
+        }
       }
 
-      this.handleInput(camera, platform);
+      if (this.tutorialGUI.getStep() == 0 && !this.tutorialGUI.isActive()) {
+        this.tutorialGUI.start();
+      } else if (this.tutorialGUI.isActive()) {
+        // Tutorial steps triggering
+        if (
+          this.tutorialGUI.getStep() == 0 &&
+          this.hasLooked &&
+          this.totalLookTime > 0.5
+        ) {
+          this.tutorialGUI.nextStep();
+        } else if (this.tutorialGUI.getStep() == 1 && this.hasMoved) {
+          this.tutorialGUI.nextStep();
+        } else if (this.tutorialGUI.getStep() == 2 && this.hasJumped) {
+          this.tutorialGUI.nextStep();
+        } else if (
+          this.tutorialGUI.getStep() == 3 &&
+          this.hasPulled &&
+          this.totalPullTime > 1.0
+        ) {
+          this.tutorialGUI.nextStep();
+        } else if (this.tutorialGUI.getStep() == 4 && this.hasScrapped) {
+          this.tutorialGUI.nextStep();
+        } else if (
+          this.tutorialGUI.getStep() == 5 &&
+          this.hasPreviewed &&
+          this.hasBuilt &&
+          this.hasRemoved
+        ) {
+          this.tutorialGUI.nextStep();
+        } else if (
+          this.tutorialGUI.getStep() == 6 &&
+          this.hasPickedUpAntennaPiece
+        ) {
+          this.tutorialGUI.nextStep();
+        }
+      }
+
+      this.handleInput(camera, platform, dt);
     } else {
-      this.introTimer += dt;
       for (let i = 0; i < introKeyFrames.length - 1; i++) {
         if (
-          this.introTimer > introKeyFrames[i].time &&
-          this.introTimer < introKeyFrames[i + 1].time
+          this.playerTimer > introKeyFrames[i].time &&
+          this.playerTimer < introKeyFrames[i + 1].time
         ) {
           const timeDiff = introKeyFrames[i + 1].time - introKeyFrames[i].time;
           const pitchDiff =
             introKeyFrames[i + 1].pitch - introKeyFrames[i].pitch;
           const jawDiff = introKeyFrames[i + 1].jaw - introKeyFrames[i].jaw;
-          const t = (this.introTimer - introKeyFrames[i].time) / timeDiff;
+          const t = (this.playerTimer - introKeyFrames[i].time) / timeDiff;
           const progress = t * t * (3 - 2 * t);
           this.pitch = introKeyFrames[i].pitch + pitchDiff * progress;
           this.jaw = introKeyFrames[i].jaw + jawDiff * progress;
@@ -282,7 +339,7 @@ export default class Player {
     camera.setUp(up);
   }
 
-  handleInput(camera: Camera, platform: Platform) {
+  handleInput(camera: Camera, platform: Platform, dt: number) {
     // Move to block ad point
     if (Input.keys["E"]) {
       if (!this.picking) {
@@ -297,6 +354,7 @@ export default class Player {
           let block = platform.getBlockFromPhysicsObject(hit.object);
           if (block && block.type == BlockType.EMPTY) {
             this.setConnectedBlock(block);
+            this.hasMoved = true;
             this.physicsObject.velocity = vec3.create();
             this.physicsObject.impulse = vec3.create();
             this.physicsObject.force = vec3.create();
@@ -309,7 +367,7 @@ export default class Player {
     }
 
     // Jump off platform
-    if (!this.jumping && Input.keys[" "]) {
+    if (Input.keys[" "]) {
       if (this.connectedBlock != null) {
         this.setConnectedBlock(null, false);
         this.floating = true;
@@ -326,8 +384,11 @@ export default class Player {
           jumpDir,
           jumpForce,
         );
+        this.hasJumped = true;
       } else if (this.tetheredBlock != null) {
         this.tetherTension = 0.1;
+        this.hasPulled = true;
+        this.totalPullTime += dt;
         vec3.scaleAndAdd(
           this.physicsObject.impulse,
           this.physicsObject.impulse,
@@ -342,9 +403,6 @@ export default class Player {
           -0.1,
         );
       }
-      this.jumping = true;
-    } else {
-      this.jumping = false;
     }
 
     if (Input.mouseClicked) {
@@ -358,10 +416,13 @@ export default class Player {
             if (type != undefined) {
               if (!platform.addBlock(offset, type)) {
                 this.inventory.addItem(type);
+              } else {
+                this.hasBuilt = true;
               }
             }
           } else if (distance <= 2.0 && platform.canRemoveBlock(block, this)) {
             if (platform.removeBlock(key)) {
+              this.hasRemoved = true;
               this.pickupBlock(block.type);
             }
           }
@@ -375,6 +436,7 @@ export default class Player {
     if (Input.keys["Q"]) {
       if (!this.convertingScrap) {
         if (this.inventory.convertSelectedScrapToTether()) {
+          this.hasScrapped = true;
           this.tetherLength += 1;
           this.inventory.setTetherLength(this.tetherLength);
         }
@@ -386,6 +448,7 @@ export default class Player {
 
     if (Input.mouseRightClicked && this.connectedBlock != null) {
       platform.highlightBlock(camera, this);
+      this.hasPreviewed = true;
       if (!this.mouseRightWasClicked) {
       }
       this.mouseRightWasClicked = true;
@@ -396,5 +459,12 @@ export default class Player {
 
   pickupBlock(blockType: BlockType) {
     this.inventory.addItem(blockType);
+    if (
+      [BlockType.ANTENNA1, BlockType.ANTENNA2, BlockType.ANTENNA3].indexOf(
+        blockType,
+      ) >= 0
+    ) {
+      this.hasPickedUpAntennaPiece = true;
+    }
   }
 }

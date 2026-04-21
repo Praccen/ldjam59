@@ -277,8 +277,11 @@ export class Platform {
     this.addBlock(vec3.fromValues(1, 0, 0), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(-1, 0, 0), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(0, 1, 0), BlockType.EMPTY).then((block) => {
-      player.setTetheredBlock(block);
-      vec3.set(player.physicsObject.impulse, -5.0, 0.0, 0.0);
+      player.setConnectedBlock(block);
+      player.physicsObject.velocity = vec3.create();
+      player.physicsObject.impulse = vec3.create();
+      player.physicsObject.force = vec3.create();
+      // vec3.set(player.physicsObject.impulse, -5.0, 0.0, 0.0);
     });
     this.addBlock(vec3.fromValues(0, -1, 0), BlockType.EMPTY);
     this.addBlock(vec3.fromValues(0, 0, 1), BlockType.EMPTY);
