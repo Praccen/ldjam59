@@ -457,12 +457,11 @@ export default class Player {
     }
   }
 
-  pickupBlock(blockType: BlockType) {
+  pickupBlock(blockType: BlockType, antennaTypesLeftToPickUp: BlockType[]) {
     this.inventory.addItem(blockType);
     if (
-      [BlockType.ANTENNA1, BlockType.ANTENNA2, BlockType.ANTENNA3].indexOf(
-        blockType,
-      ) >= 0
+      antennaTypesLeftToPickUp.indexOf(blockType) >= 0 &&
+      this.tutorialGUI.getStep() == 6
     ) {
       this.hasPickedUpAntennaPiece = true;
     }

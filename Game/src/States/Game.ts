@@ -402,7 +402,7 @@ export default class Game {
           this.player.physicsObject.transform.position,
         ) < 2.0
       ) {
-        this.player.pickupBlock(block.type);
+        this.player.pickupBlock(block.type, this.antennaTypesLeftToPickUp);
         if (this.antennaTypesLeftToPickUp.indexOf(block.type) >= 0) {
           this.antennaTypesLeftToPickUp.splice(
             this.antennaTypesLeftToPickUp.indexOf(block.type),
