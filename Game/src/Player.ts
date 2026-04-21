@@ -310,17 +310,11 @@ export default class Player {
       this.jumping = false;
     }
 
-    if (Input.keys["SHIFT"]) {
-      platform.showRemovableBlock(camera, this);
-    }
-
     if (Input.mouseClicked) {
       if (!this.mouseWasClicked) {
-        if (Input.keys["SHIFT"]) {
-          let type = platform.removeBlockFromRayCast(camera, this);
-          if (type != undefined) {
-            this.pickupBlock(type!);
-          }
+        let typeRemove = platform.removeBlockFromRayCast(camera, this);
+        if (typeRemove != undefined) {
+          this.pickupBlock(typeRemove!);
         } else {
           let type = this.inventory.useSelected();
           if (type != undefined) {
@@ -349,6 +343,7 @@ export default class Player {
 
     if (Input.mouseRightClicked && this.connectedBlock != null) {
       platform.showEmptyBlock(camera, this);
+      platform.showRemovableBlock(camera, this);
       if (!this.mouseRightWasClicked) {
       }
       this.mouseRightWasClicked = true;
